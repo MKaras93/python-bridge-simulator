@@ -1,78 +1,79 @@
-from pygame.time import Clock
+import datetime
+from typing import Tuple, List
+
 import math
-import matplotlib.pyplot as plt
+import pymunk
+from pymunk import Vec2d
+
+from server.utils import clockwise_degrees_to_anti_clockwise_radian, anticlockwise_radian_to_clockwise_degrees
 
 
-class HyperspaceCoords:
-    def __init__(self, x: float, y: float):
-        self.x = x
-        self.y = y
+class HyperSpace(pymunk.Space):
+    def __init__(self, threaded=False):
+        super().__init__(threaded=threaded)
+        self.ships = []
+
+    def create_ship(self, position: Tuple[float, float], angle_degree: float = 0):
+        ship = HyperspaceShip()
+        ship.body.position = position
+        ship.body.angle = math.radians(angle_degree)
+        self.add(ship.body)
+        self.ships.append(ship)
+        return ship
+
+    def tick(self):
+        for ship in self.ships:
+            ship.tick()
 
 
-class HyperspaceObject(HyperspaceCoords):
-    def __init__(self, x: float, y: float):
-        super().__init__(x, y)
-
-
-class MovingHyperspaceObject(HyperspaceObject):
-    def __init__(self, x: float, y: float, velocity: float, facing: int):
-        super().__init__(x, y)
-        self.velocity = velocity
-        self.facing = facing
+class HyperspaceShip:
+    def __init__(self):
+        self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC, mass=1, moment=1)
+        self.engine_percent: int = 0
+        self.engine_power = 100
+        self.engine_cut_off_time = None
+        self.rotation_engine_power = 100
+        self.rotation_engine_percent: int = 0
+        self.target_angle = None
 
     @property
-    def facing(self):
-        return self._facing
+    def angle(self) -> float:
+        return anticlockwise_radian_to_clockwise_degrees(self.body.angle)
 
-    @facing.setter
-    def facing(self, value):
-        self._facing = value % 360
+    @angle.setter
+    def angle(self, value: int):
+        self.body.angle = clockwise_degrees_to_anti_clockwise_radian(value)
 
-    def _update_position(self):
-        f = math.radians(self.facing)
-        self.x = round(self.x + math.sin(f) * self.velocity, 2)
-        self.y = round(self.y + math.cos(f) * self.velocity, 2)
+    def _cut_off_engine(self):
+        self.engine_percent = 0
+        self.engine_cut_off_time = None
 
-    def tick(self, debug: bool = False):
-        self._update_position()
-        print(self.x, self.y)
-        if debug:
-            plt.scatter(self.x, self.y)
+    def _add_engine_force(self):
+        if self.engine_percent != 0:
+            speed = self.engine_percent/100*self.engine_power
+            force_vector = Vec2d(speed, 0)
+            self.body.apply_force_at_local_point(force_vector)
 
+        if self.engine_cut_off_time is not None:
+            now = datetime.datetime.now()
+            if now >= self.engine_cut_off_time:
+                self._cut_off_engine()
 
-class HyperspaceShip(MovingHyperspaceObject):
-    ships = []
+    def _rotate(self):
+        if self.target_angle is None:
+            return
 
-    def __init__(self, x: float, y: float, velocity: float, facing: int):
-        super().__init__(x, y, velocity, facing)
-        self.ships.append(self)
+        angular_diff = self.target_angle - self.angle
+        if abs(angular_diff) <= 1:
+            self.body.angle = clockwise_degrees_to_anti_clockwise_radian(self.target_angle)
+            self.target_angle = None
+            self.body.angular_velocity = 0
+        else:
+            angular_velocity = self.rotation_engine_power * self.rotation_engine_percent/100
+            angular_velocity = -angular_velocity if angular_diff > 0 else angular_velocity
+            self.body.angular_velocity = math.radians(angular_velocity)
 
-
-class Sector(HyperspaceObject):
-    def __init__(self, x: float, y: float):
-        super().__init__(x, y)
-
-
-def tick(clock, debug: bool = False):
-    for ship in HyperspaceShip.ships:
-        ship.tick(debug=debug)
-    clock.tick(2)
-
-
-def main_loop(ticks=None, clock=None, debug: bool = False):
-    if clock is None:
-        clock = Clock()
-
-    running = True
-
-    if ticks is None:
-        while running:
-            tick(clock, debug=debug)
-        return
-
-    for tick_num in range(0, ticks):
-        tick(clock, debug=debug)
-    return
-
-
-main_ship = HyperspaceShip(0, 0, 0.01, 45)
+    def tick(self):
+        # print(f"Ticking {self}")
+        self._rotate()
+        self._add_engine_force()
