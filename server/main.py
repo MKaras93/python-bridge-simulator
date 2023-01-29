@@ -1,91 +1,32 @@
-import math
-import random
+import asyncio
 
-import pymunk
-import pyglet
-from pymunk.pyglet_util import DrawOptions
+from fastapi import FastAPI
+from uvicorn import Config, Server
 
-from server.hyperspace import HyperSpace
+from game.loop import Game
+from game.utils import get_ship
 
-
-options = DrawOptions()
-
-window = pyglet.window.Window(800, 600, "Brackets")
+app = FastAPI()
 
 
-# space
-space = HyperSpace()
-space.gravity = 0, 0
-space.damping = 0.2
-ct = 0
-
-def create_circle_for_body(body: pymunk.Body, radius=10):
-    circle = pymunk.Circle(body, radius=radius)
-    space.add(circle)
+@app.get("/")
+async def read_root():
+    return {"Hello": "World"}
 
 
-# create initial bodies:
-ship = space.create_ship((100, 500), 0)
-ship.engine_power = 500
-ship.engine_percent = 10
-create_circle_for_body(ship.body)
-ship.rotation_engine_power = 90
-ship.rotation_engine_percent = 50
-ship.angle = 0
-ship.target_angle = 160
-# ship.body.apply_force_at_local_point((-900, 0))
-# ship.body.apply_force_at_local_point((-1000, 0))
+@app.get("/ships/{ship_count}")
+async def create_ships(ship_count: int):
+    for i in range(0, ship_count):
+        print("creating ship")
+        get_ship(game.space)
+    return [ship.target_angle for ship in game.space.ships]
 
-# body = pymunk.Body(body_type=pymunk.Body.KINEMATIC, mass=0)
-# body.position = 500, 500
-# body.angle = math.radians(45)
-# force = (10000, 10000)
-# body.apply_impulse_at_local_point(force)
-# body.velocity = -10, 0
-# circle = pymunk.circle.create_box(body, size=(100, 10))
-# space.add(body, circle)
-# loop
+game = Game()
 
+loop = asyncio.new_event_loop()
+loop.create_task(game.main_loop())
 
-@window.event
-def on_draw():
-    window.clear()
-    space.debug_draw(options)
+config = Config(app=app, loop=loop)  # noqa
+server = Server(config)
 
-
-def update(dt):
-    space.step(dt)  # Step the simulation one step forward
-    try:
-        update.ct += 1
-    except AttributeError:
-        update.ct = 0
-
-    # if update.ct % 100 == 0:
-    #     ship.angle += 90
-
-    space.tick()
-
-    if update.ct % 300 == 0:
-        sign = random.choice((-1, 1))
-        new_value = ship.target_angle + 30 * sign if ship.target_angle is not None else 30 + sign * 30
-        print(f"setting new target angle to {new_value}. Current angle: {ship.angle}.")
-        ship.target_angle = new_value
-        pass
-        # ship
-        # if ship.engine_percent == 20:
-        #     ship.engine_percent = 0
-        # else:
-        #     ship.engine_percent = 20
-
-        # ship.angle += 25
-        # pass
-
-    # if update.engines_on:
-    #     ship.body.apply_force_at_local_point((500, 0))
-    # ship.body.apply_force_at_local_point((1000, 0))
-    # print(ship.body.force)
-    # print(ship.body.velocity)
-
-
-pyglet.clock.schedule_interval(update, 1/60)
-pyglet.app.run()
+loop.run_until_complete(server.serve())

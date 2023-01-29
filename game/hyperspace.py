@@ -5,13 +5,13 @@ import math
 import pymunk
 from pymunk import Vec2d
 
-from server.utils import clockwise_degrees_to_anti_clockwise_radian, anticlockwise_radian_to_clockwise_degrees
+from .utils import clockwise_degrees_to_anti_clockwise_radian, anticlockwise_radian_to_clockwise_degrees
 
 
 class HyperSpace(pymunk.Space):
     def __init__(self, threaded=False):
         super().__init__(threaded=threaded)
-        self.ships = []
+        self.ships: List[HyperspaceShip] = []
 
     def create_ship(self, position: Tuple[float, float], angle_degree: float = 0):
         ship = HyperspaceShip()
@@ -49,7 +49,9 @@ class HyperspaceShip:
         self.engine_cut_off_time = None
 
     def _add_engine_force(self):
-        if self.engine_percent != 0:
+        if self.engine_percent == 0:
+            return
+        else:
             speed = self.engine_percent/100*self.engine_power
             force_vector = Vec2d(speed, 0)
             self.body.apply_force_at_local_point(force_vector)
@@ -74,6 +76,5 @@ class HyperspaceShip:
             self.body.angular_velocity = math.radians(angular_velocity)
 
     def tick(self):
-        # print(f"Ticking {self}")
         self._rotate()
         self._add_engine_force()
