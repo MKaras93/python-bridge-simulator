@@ -1,5 +1,5 @@
 import datetime
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import math
 import pymunk
@@ -13,12 +13,19 @@ class HyperSpace(pymunk.Space):
         super().__init__(threaded=threaded)
         self.ships: List[HyperspaceShip] = []
 
-    def create_ship(self, position: Tuple[float, float], angle_degree: float = 0):
-        ship = HyperspaceShip()
+    def create_ship(self, position: Tuple[float, float], angle_degree: float = 0, ship_cls: Optional[type] = None) -> "HyperspaceShip":
+        if not ship_cls:
+            ship_cls = HyperspaceShip
+
+        ship = ship_cls(space=self)
         ship.body.position = position
         ship.body.angle = math.radians(angle_degree)
-        self.add(ship.body)
-        self.ships.append(ship)
+
+        # debug
+        # ship.engine_power = 100
+        # ship.engine_percent = 10
+        # ship.rotation_engine_power = 90
+        # ship.rotation_engine_percent = 50
         return ship
 
     def tick(self):
@@ -27,14 +34,20 @@ class HyperSpace(pymunk.Space):
 
 
 class HyperspaceShip:
-    def __init__(self):
+    def __init__(self, space: Optional[HyperSpace]=None):
+        self.space = space
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC, mass=1, moment=1)
         self.engine_percent: int = 0
         self.engine_power = 100
         self.engine_cut_off_time = None
         self.rotation_engine_power = 100
-        self.rotation_engine_percent: int = 0
+        self.rotation_engine_percent: int = 10
         self.target_angle = None
+        self.circle = pymunk.Circle(self.body, radius=10)
+        if space:
+            self.space.add(self.body)
+            self.space.add(self.circle)
+            self.space.ships.append(self)
 
     @property
     def angle(self) -> float:
@@ -62,6 +75,9 @@ class HyperspaceShip:
                 self._cut_off_engine()
 
     def _rotate(self):
+        # TODO: Change. With this logic the ship has a constant turn it makes per frame. If this turn is bigger than the
+        # angular_diff - it will miss the target_angle and fall into infinite loop.
+
         if self.target_angle is None:
             return
 
