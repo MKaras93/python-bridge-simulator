@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import asyncio
+from typing import TYPE_CHECKING
 
 import pygame
 import pymunk
@@ -7,6 +10,9 @@ import pymunk.pygame_util
 from .scenarios import ACTIVE_SCENARIO
 from .hyperspace import HyperSpace
 
+if TYPE_CHECKING:
+    from typing import Optional
+    from game.player_ship import PlayerShip
 
 class Game:
     @staticmethod
@@ -22,7 +28,7 @@ class Game:
         self.screen = pygame.display.set_mode((1000, 700))
         self.options = pymunk.pygame_util.DrawOptions(self.screen)
         self.ct = 0
-        self.player_ship = None
+        self.player_ship: Optional[PlayerShip] = None
         self.scenario = ACTIVE_SCENARIO(self)
         pygame.init()
 

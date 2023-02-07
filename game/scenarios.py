@@ -6,14 +6,18 @@ from game.hyperspace import HyperspaceShip
 from game.player_ship import PlayerShip
 from game.ship_modules import Cockpit
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from game.loop import Game
 
 class BaseScenario:
     PLAYER_SHIP_MODULES = [
             Cockpit(),
         ]
 
-    def __init__(self, game: "Game"):
-        self.game = game
+    def __init__(self, game: Game):
+        self.game: Game = game
 
     def play(self, ct: int):
         if ct == 1:
@@ -86,6 +90,12 @@ class PlayerShipTestScenario(BaseScenario):
     def _setup(self):
         super()._setup()
         self._setup_player_ship()
+
+    def play(self, ct: int):
+        super().play(ct)
+        # print(self.game.player_ship.modules.cockpit.target_angle)
+        # self.game.player_ship.modules.cockpit.target_angle = 150
+        # print(self.game.player_ship.hyperspace_ship.target_angle)
 
 
 ACTIVE_SCENARIO = PlayerShipTestScenario
