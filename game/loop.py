@@ -22,6 +22,7 @@ class Game:
         self.screen = pygame.display.set_mode((1000, 700))
         self.options = pymunk.pygame_util.DrawOptions(self.screen)
         self.ct = 0
+        self.player_ship = None
         self.scenario = ACTIVE_SCENARIO(self)
         pygame.init()
 

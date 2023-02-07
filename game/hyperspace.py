@@ -43,10 +43,10 @@ class HyperspaceShip:
         self.rotation_engine_power = 100
         self.rotation_engine_percent: int = 10
         self.target_angle = None
-        self.circle = pymunk.Circle(self.body, radius=10)
+        self._circle = pymunk.Circle(self.body, radius=10)
         if space:
             self.space.add(self.body)
-            self.space.add(self.circle)
+            self.space.add(self._circle)
             self.space.ships.append(self)
 
     @property
@@ -94,3 +94,4 @@ class HyperspaceShip:
     def tick(self):
         self._rotate()
         self._add_engine_force()
+

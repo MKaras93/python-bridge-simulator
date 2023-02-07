@@ -1,19 +1,44 @@
+from __future__ import annotations
+
 import random
 
-from pymunk import Vec2d
-
 from game.hyperspace import HyperspaceShip
+from game.player_ship import PlayerShip
+from game.ship_modules import Cockpit
+
 
 class BaseScenario:
+    PLAYER_SHIP_MODULES = [
+            Cockpit(),
+        ]
+
     def __init__(self, game: "Game"):
         self.game = game
 
     def play(self, ct: int):
         if ct == 1:
             self._setup()
+        pass
 
     def _setup(self):
         print(f"Setting up {self.__class__}.")
+
+    def _setup_player_ship(self):
+        print("adding player ship")
+        starting_coords = (500, 500)
+        hyperspace_ship: HyperspaceShip = self.game.space.create_ship(starting_coords)
+        hyperspace_ship.engine_percent = 0
+        hyperspace_ship.rotation_engine_percent = 0
+        self.game.space.ships.append(hyperspace_ship)
+
+        player_ship = PlayerShip(
+            game=self.game,
+            hyperspace_ship=hyperspace_ship,
+        )
+        for module in self.PLAYER_SHIP_MODULES:
+            player_ship.add_module(module)
+
+        self.game.player_ship = player_ship
 
 
 class RandomShipsScenario(BaseScenario):
@@ -44,7 +69,9 @@ class RandomShipsScenario(BaseScenario):
     def _set_random_target_angle_for_ships(self):
         for ship in self.game.space.ships:
             new_value = random.randint(0, 360)
-            print(f"setting new target angle to {new_value}. Current angle: {ship.angle}.")
+            print(
+                f"setting new target angle to {new_value}. Current angle: {ship.angle}."
+            )
             ship.target_angle = new_value
 
     def _turn_off_engines_during_rotation(self):
@@ -55,22 +82,10 @@ class RandomShipsScenario(BaseScenario):
                 ship.engine_percent = 10
 
 
-def _fly_to_point(ship: HyperspaceShip, target_x, target_y):
-    ship.rotation_engine_percent = 0
-    ship.engine_percent = 0
-    angle = ship.body.position.get_angle_degrees_between(Vec2d(target_x, target_y))
-    print("angle:", angle)
-    ship.target_angle = ship.angle - angle
-    if ship.target_angle:
-        ship.rotation_engine_percent = 50
-
-    if ship.angle - ship.target_angle < 5:
-        ship.rotation_engine_percent = 0
-        distance = ship.body.position.get_distance((target_x, target_y))
-        print("distance to target:", distance)
-        ship.engine_percent = distance
-        if distance <= 10:
-            print("Target in sight!")
+class PlayerShipTestScenario(BaseScenario):
+    def _setup(self):
+        super()._setup()
+        self._setup_player_ship()
 
 
-ACTIVE_SCENARIO = RandomShipsScenario
+ACTIVE_SCENARIO = PlayerShipTestScenario

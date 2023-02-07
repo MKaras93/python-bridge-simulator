@@ -97,3 +97,21 @@ def update(dt):
 
 pyglet.clock.schedule_interval(update, 1/60)
 pyglet.app.run()
+
+
+# def _fly_to_point(ship: HyperspaceShip, target_x, target_y):
+#     ship.rotation_engine_percent = 0
+#     ship.engine_percent = 0
+#     angle = ship.body.position.get_angle_degrees_between(Vec2d(target_x, target_y))
+#     print("angle:", angle)
+#     ship.target_angle = ship.angle - angle
+#     if ship.target_angle:
+#         ship.rotation_engine_percent = 50
+#
+#     if ship.angle - ship.target_angle < 5:
+#         ship.rotation_engine_percent = 0
+#         distance = ship.body.position.get_distance((target_x, target_y))
+#         print("distance to target:", distance)
+#         ship.engine_percent = distance
+#         if distance <= 10:
+#             print("Target in sight!")
