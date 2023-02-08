@@ -20,7 +20,9 @@ class PlayerShip:
         self.space = game.space
         self.hyperspace_ship = hyperspace_ship
         self.modules = ShipModules()
+        self.module_names = set()
 
     def add_module(self, module: ShipModule):
         setattr(self.modules, module.module_type, module)
+        self.module_names.add(module.module_type)
         module.attach_to_ship(self)
