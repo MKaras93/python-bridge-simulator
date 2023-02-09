@@ -54,3 +54,8 @@ async def get_attr(ship_reading: ShipReading):
     module = getattr(game.player_ship.modules, ship_reading.module)
     value = getattr(module, ship_reading.attribute)
     return {"value": value}
+
+
+@router.get("/mothership/modules")
+async def mothership():
+    return game.player_ship.module_names
