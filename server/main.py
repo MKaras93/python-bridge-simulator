@@ -10,7 +10,7 @@ app = FastAPI()
 app.include_router(router)
 
 loop = asyncio.new_event_loop()
-loop.create_task(game.main_loop())
+loop.create_task(game.simulation.main_loop())
 
 config = Config(app=app, loop=loop)  # noqa
 server = Server(config)
