@@ -14,7 +14,8 @@ if TYPE_CHECKING:
     from typing import Optional
     from game.player_ship import PlayerShip
 
-class Game:
+
+class Simulation:
     @staticmethod
     def _get_space() -> HyperSpace:
         space = HyperSpace()
@@ -55,3 +56,9 @@ class Game:
                 ):
                     print("Game Over!")
                     quit()
+
+
+class Game:
+    def __init__(self, server):
+        self.server = server
+        self.simulation = Simulation()

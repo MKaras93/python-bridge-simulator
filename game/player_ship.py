@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from game.ship_modules import ShipModules, ShipModule
 
 if TYPE_CHECKING:
-    from game.loop import Game
+    from game.loop import Simulation
     from game.hyperspace import HyperspaceShip
 
 
@@ -15,7 +15,7 @@ class PlayerShip:
     Everything the server (so the players) do has to come through this object.
     Differences between normal npc ship and players ship are implemented here.
     """
-    def __init__(self, game: Game, hyperspace_ship: HyperspaceShip):
+    def __init__(self, game: Simulation, hyperspace_ship: HyperspaceShip):
         self.game = game
         self.space = game.space
         self.hyperspace_ship = hyperspace_ship

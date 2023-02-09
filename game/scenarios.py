@@ -9,15 +9,15 @@ from game.ship_modules import Cockpit
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from game.loop import Game
+    from game.loop import Simulation
 
 class BaseScenario:
     PLAYER_SHIP_MODULES = [
             Cockpit(),
         ]
 
-    def __init__(self, game: Game):
-        self.game: Game = game
+    def __init__(self, game: Simulation):
+        self.game: Simulation = game
 
     def play(self, ct: int):
         if ct == 1:
