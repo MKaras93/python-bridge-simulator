@@ -3,7 +3,6 @@ from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel, validator
 
-from server.game_objects import game
 
 router = APIRouter()
 
@@ -43,7 +42,9 @@ class ShipReading(BaseModel):
 @router.post("/set_attr")
 async def set_attr(ship_instruction: ShipInstruction):
     # TODO validate module and attribute or handle errors
-    module: str = getattr(game.simulation.player_ship.modules, ship_instruction.module)
+    module: str = getattr(
+        router.server.game.simulation.player_ship.modules, ship_instruction.module
+    )
     setattr(module, ship_instruction.attribute, ship_instruction.value)
     return {}
 
@@ -51,11 +52,13 @@ async def set_attr(ship_instruction: ShipInstruction):
 @router.post("/get_attr")
 async def get_attr(ship_reading: ShipReading):
     # TODO validate module and attribute or handle errors
-    module = getattr(game.simulation.player_ship.modules, ship_reading.module)
+    module = getattr(
+        router.server.game.simulation.player_ship.modules, ship_reading.module
+    )
     value = getattr(module, ship_reading.attribute)
     return {"value": value}
 
 
 @router.get("/mothership/modules")
 async def mothership():
-    return game.simulation.player_ship.module_names
+    return router.server.simulation.player_ship.module_names
