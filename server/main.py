@@ -1,4 +1,5 @@
-from server.fast_api_server import PythonBridgeSimulatorHttpServer
+from server.fast_api_server.fast_api_server import PythonBridgeSimulatorHttpServer
 
-server = PythonBridgeSimulatorHttpServer()
+server_class = PythonBridgeSimulatorHttpServer
+server = server_class()
 server.run()

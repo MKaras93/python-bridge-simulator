@@ -8,7 +8,7 @@ from game.loop import Game
 
 class PythonBridgeSimulatorHttpServer:
     def __init__(self):
-        from server.player_ship import router
+        from server.fast_api_server.endpoints import router
 
         self.game = Game(server=self)
 
