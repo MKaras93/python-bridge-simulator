@@ -1,14 +1,20 @@
 from __future__ import annotations
 
-from typing import Optional
+import abc
+from typing import Optional, Any
 from typing import TYPE_CHECKING
+
+from game.errors import (
+    NoSuchModuleAttributeException,
+    NoSuchModuleException,
+)
 
 if TYPE_CHECKING:
     from game.hyperspace import HyperspaceShip
     from game.player_ship import PlayerShip
 
 
-class ShipModule:
+class ShipModule(abc.ABC):
     module_type = None
 
     def __init__(self):
@@ -19,6 +25,22 @@ class ShipModule:
         self.player_ship = player_ship
         self.hyperspace_ship = self.player_ship.hyperspace_ship
         print("Attached module:", self)
+
+    def _validate_attribute_name(self, attribute_name: str):
+        if attribute_name.startswith("_") or not hasattr(self, attribute_name):
+            raise NoSuchModuleAttributeException(
+                f"Module {self.module_type} doesn't have attribute '{attribute_name}'."
+            )
+
+    def read_attr(self, attribute_name: str):
+        # if anything aside happens during reading, it should happen here.
+        self._validate_attribute_name(attribute_name)
+        return getattr(self, attribute_name)
+
+    def write_attr(self, attribute_name: str, value: Any):
+        self._validate_attribute_name(attribute_name)
+        setattr(self, attribute_name, value)
+        return value
 
 
 class Cockpit(ShipModule):
@@ -67,3 +89,7 @@ class ShipSubmodule:
 class ShipModules:
     def __init__(self):
         self.cockpit = Optional[Cockpit]
+
+    def validate_module_name(self, module_name: str):
+        if module_name.startswith("_") or not hasattr(self, module_name):
+            raise NoSuchModuleException(f"Module '{module_name}' does not exist.")

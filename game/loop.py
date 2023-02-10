@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pygame
 import pymunk
@@ -9,6 +9,7 @@ import pymunk.pygame_util
 
 from .scenarios import ACTIVE_SCENARIO
 from .hyperspace import HyperSpace
+from .ship_modules import ShipModule
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -59,6 +60,11 @@ class Simulation:
 
 
 class Game:
+    """
+    Main class wrapping the whole game, simulation etc.
+    It exposes interface which the Server class can use to interact with the game.
+    """
+
     def __init__(self):
         self.server = None
         self.simulation = Simulation()
@@ -66,3 +72,20 @@ class Game:
     def attach_server(self, server):
         print(f"Attaching game to {server}")
         self.server = server
+
+    def get_attribute(self, user_name: str, module_name: str, attribute_name: str):
+        self.simulation.player_ship.modules.validate_module_name(module_name)
+        module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
+        self._check_permission(module_name, user_name)
+        return module.read_attr(attribute_name)
+
+    def set_attribute(self, user_name: str, module_name: str, attribute_name: str, value: Any):
+        self.simulation.player_ship.modules.validate_module_name(module_name)
+        module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
+        self._check_permission(module_name, user_name)
+        return module.write_attr(attribute_name, value)
+
+
+    def _check_permission(self, module_name: str, user_name: str):
+        # TODO
+        return True  # mock
