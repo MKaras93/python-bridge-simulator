@@ -59,6 +59,10 @@ class Simulation:
 
 
 class Game:
-    def __init__(self, server):
-        self.server = server
+    def __init__(self):
+        self.server = None
         self.simulation = Simulation()
+
+    def attach_server(self, server):
+        print(f"Attaching game to {server}")
+        self.server = server
