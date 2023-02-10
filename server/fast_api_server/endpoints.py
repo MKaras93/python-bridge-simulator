@@ -8,6 +8,7 @@ from game.errors import NoSuchModuleException, NoSuchModuleAttributeException
 
 router = APIRouter()
 
+
 # TODO: endpoint should only pass value in payload - module name and attribute in path.
 
 
@@ -42,7 +43,7 @@ async def set_attr(ship_instruction: ShipInstruction):
         response = JSONResponse(
             {
                 "module_name": f"Attribute '{ship_instruction.attribute}' doesn't exist for module"
-                f" '{ship_instruction.module}'"
+                               f" '{ship_instruction.module}'"
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -69,7 +70,7 @@ async def get_attr(ship_reading: ShipReading):
         response = JSONResponse(
             {
                 "module_name": f"Attribute '{ship_reading.attribute}' doesn't exist for module"
-                f" '{ship_reading.module}'"
+                               f" '{ship_reading.module}'"
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
