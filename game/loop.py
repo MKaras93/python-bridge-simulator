@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pygame
 import pymunk
 import pymunk.pygame_util
 
+from .errors import NoSuchModuleAttributeException, NoSuchModuleException
 from .scenarios import ACTIVE_SCENARIO
 from .hyperspace import HyperSpace
+from .ship_modules import ShipModule
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -73,16 +75,21 @@ class Game:
         self.server = server
 
     def get_attribute(self, user_name: str, module_name: str, attribute_name: str):
-        # TODO: validate attribute name is public
-        module = self._get_module(module_name)
-        self._check_permission(module_name, user_name)  # TODO: shouldn't this be a module method?
-        value = module.get_attribute_value(attribute_name)
+        self.simulation.player_ship.modules.validate_module_name(module_name)
+        module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
+        self._check_permission(module_name, user_name)
+        module.validate_attribute_name(attribute_name)
+        value = getattr(module, attribute_name)
         return value
 
-    def _get_module(self, module_name: str):
-        # TODO: validate module_name is public
-        module = getattr(self.simulation.player_ship.modules, module_name)
-        return module
+    def set_attribute(self, user_name: str, module_name: str, attribute_name: str, value: Any):
+        self.simulation.player_ship.modules.validate_module_name(module_name)
+        module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
+        self._check_permission(module_name, user_name)
+        module.validate_attribute_name(attribute_name)
+        setattr(module, attribute_name, value)
+        return value
 
     def _check_permission(self, module_name: str, user_name: str):
+        # TODO
         return True  # mock

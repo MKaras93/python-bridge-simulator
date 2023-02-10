@@ -4,7 +4,10 @@ import abc
 from typing import Optional
 from typing import TYPE_CHECKING
 
-from game.errors import NoSuchModuleAttributeException
+from game.errors import (
+    NoSuchModuleAttributeException,
+    NoSuchModuleException,
+)
 
 if TYPE_CHECKING:
     from game.hyperspace import HyperspaceShip
@@ -23,14 +26,11 @@ class ShipModule(abc.ABC):
         self.hyperspace_ship = self.player_ship.hyperspace_ship
         print("Attached module:", self)
 
-    def get_attribute_value(self, attribute_name: str):
-        # more complicated logic will be here in the future.
-        try:
-            return getattr(self, attribute_name)
-        except AttributeError as e:
+    def validate_attribute_name(self, attribute_name: str):
+        if attribute_name.startswith("_") or not hasattr(self, attribute_name):
             raise NoSuchModuleAttributeException(
-                f"Invalid attribute: {attribute_name} for module {self.module_type}"
-            ) from e
+                f"Module {self.module_type} doesn't have attribute '{attribute_name}'."
+            )
 
 
 class Cockpit(ShipModule):
@@ -79,3 +79,7 @@ class ShipSubmodule:
 class ShipModules:
     def __init__(self):
         self.cockpit = Optional[Cockpit]
+
+    def validate_module_name(self, module_name: str):
+        if module_name.startswith("_") or not hasattr(self, module_name):
+            raise NoSuchModuleException(f"Module '{module_name}' does not exist.")

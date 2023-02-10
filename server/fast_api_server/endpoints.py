@@ -1,21 +1,14 @@
 from typing import Any
 
-from fastapi import APIRouter
-from pydantic import BaseModel, validator
+from fastapi import APIRouter, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
+from game.errors import NoSuchModuleException, NoSuchModuleAttributeException
 
 router = APIRouter()
 
-
-def _validate_no_private(value: str):
-    """
-    Raises an error if the value seems to be a name of a private attribute/method (begins with "_")
-    """
-    if value.startswith("_"):
-        raise ValueError(
-            "Names beginning with '_' are considered private and can't be accessed by this endpoint."
-        )
-    return value
+# TODO: endpoint should only pass value in payload - module name and attribute in path.
 
 
 class ShipInstruction(BaseModel):
@@ -23,40 +16,64 @@ class ShipInstruction(BaseModel):
     attribute: str
     value: Any
 
-    # validators
-    disallow_private = validator("module", "attribute", allow_reuse=True)(
-        _validate_no_private
-    )
-
 
 class ShipReading(BaseModel):
     module: str
     attribute: str
 
-    # validators
-    disallow_private = validator("module", "attribute", allow_reuse=True)(
-        _validate_no_private
-    )
-
 
 @router.post("/set_attr")
 async def set_attr(ship_instruction: ShipInstruction):
-    # TODO validate module and attribute or handle errors
-    module: str = getattr(
-        router.server.game.simulation.player_ship.modules, ship_instruction.module
-    )
-    setattr(module, ship_instruction.attribute, ship_instruction.value)
-    return {}
+    user_name = "test"  # TODO: get username
+
+    try:
+        value = router.server.game.set_attribute(
+            user_name,
+            ship_instruction.module,
+            ship_instruction.attribute,
+            ship_instruction.value,
+        )
+    except NoSuchModuleException:
+        response = JSONResponse(
+            {"module_name": f"Module '{ship_instruction.module}' doesn't exist."},
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    except NoSuchModuleAttributeException:
+        response = JSONResponse(
+            {
+                "module_name": f"Attribute '{ship_instruction.attribute}' doesn't exist for module"
+                f" '{ship_instruction.module}'"
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    else:
+        response = {"value": value}
+
+    return response
 
 
 @router.post("/get_attr")
 async def get_attr(ship_reading: ShipReading):
-    # TODO validate module and attribute or handle errors
-    user_name = "test"
-    value = router.server.game.get_attribute(user_name, ship_reading.module, ship_reading.attribute)
-    return {"value": value}
+    user_name = "test"  # TODO: get username
 
+    try:
+        value = router.server.game.get_attribute(
+            user_name, ship_reading.module, ship_reading.attribute
+        )
+    except NoSuchModuleException:
+        response = JSONResponse(
+            {"module_name": f"Module '{ship_reading.module}' doesn't exist."},
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    except NoSuchModuleAttributeException:
+        response = JSONResponse(
+            {
+                "module_name": f"Attribute '{ship_reading.attribute}' doesn't exist for module"
+                f" '{ship_reading.module}'"
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    else:
+        response = {"value": value}
 
-@router.get("/mothership/modules")
-async def mothership():
-    return router.server.simulation.player_ship.module_names
+    return response
