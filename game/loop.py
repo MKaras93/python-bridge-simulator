@@ -7,7 +7,6 @@ import pygame
 import pymunk
 import pymunk.pygame_util
 
-from .errors import NoSuchModuleAttributeException, NoSuchModuleException
 from .scenarios import ACTIVE_SCENARIO
 from .hyperspace import HyperSpace
 from .ship_modules import ShipModule
@@ -78,17 +77,14 @@ class Game:
         self.simulation.player_ship.modules.validate_module_name(module_name)
         module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
         self._check_permission(module_name, user_name)
-        module.validate_attribute_name(attribute_name)
-        value = getattr(module, attribute_name)
-        return value
+        return module.read_attr(attribute_name)
 
     def set_attribute(self, user_name: str, module_name: str, attribute_name: str, value: Any):
         self.simulation.player_ship.modules.validate_module_name(module_name)
         module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
         self._check_permission(module_name, user_name)
-        module.validate_attribute_name(attribute_name)
-        setattr(module, attribute_name, value)
-        return value
+        return module.write_attr(attribute_name, value)
+
 
     def _check_permission(self, module_name: str, user_name: str):
         # TODO

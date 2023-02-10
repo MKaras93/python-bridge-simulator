@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Optional
+from typing import Optional, Any
 from typing import TYPE_CHECKING
 
 from game.errors import (
@@ -26,11 +26,21 @@ class ShipModule(abc.ABC):
         self.hyperspace_ship = self.player_ship.hyperspace_ship
         print("Attached module:", self)
 
-    def validate_attribute_name(self, attribute_name: str):
+    def _validate_attribute_name(self, attribute_name: str):
         if attribute_name.startswith("_") or not hasattr(self, attribute_name):
             raise NoSuchModuleAttributeException(
                 f"Module {self.module_type} doesn't have attribute '{attribute_name}'."
             )
+
+    def read_attr(self, attribute_name: str):
+        # if anything aside happens during reading, it should happen here.
+        self._validate_attribute_name(attribute_name)
+        return getattr(self, attribute_name)
+
+    def write_attr(self, attribute_name: str, value: Any):
+        self._validate_attribute_name(attribute_name)
+        setattr(self, attribute_name, value)
+        return value
 
 
 class Cockpit(ShipModule):
