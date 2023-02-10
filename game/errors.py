@@ -1,0 +1,2 @@
+class NoSuchModuleAttributeException(Exception):
+    pass

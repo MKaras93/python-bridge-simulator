@@ -59,6 +59,11 @@ class Simulation:
 
 
 class Game:
+    """
+    Main class wrapping the whole game, simulation etc.
+    It exposes interface which the Server class can use to interact with the game.
+    """
+
     def __init__(self):
         self.server = None
         self.simulation = Simulation()
@@ -66,3 +71,18 @@ class Game:
     def attach_server(self, server):
         print(f"Attaching game to {server}")
         self.server = server
+
+    def get_attribute(self, user_name: str, module_name: str, attribute_name: str):
+        # TODO: validate attribute name is public
+        module = self._get_module(module_name)
+        self._check_permission(module_name, user_name)  # TODO: shouldn't this be a module method?
+        value = module.get_attribute_value(attribute_name)
+        return value
+
+    def _get_module(self, module_name: str):
+        # TODO: validate module_name is public
+        module = getattr(self.simulation.player_ship.modules, module_name)
+        return module
+
+    def _check_permission(self, module_name: str, user_name: str):
+        return True  # mock

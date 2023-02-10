@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+import abc
 from typing import Optional
 from typing import TYPE_CHECKING
+
+from game.errors import NoSuchModuleAttributeException
 
 if TYPE_CHECKING:
     from game.hyperspace import HyperspaceShip
     from game.player_ship import PlayerShip
 
 
-class ShipModule:
+class ShipModule(abc.ABC):
     module_type = None
 
     def __init__(self):
@@ -19,6 +22,15 @@ class ShipModule:
         self.player_ship = player_ship
         self.hyperspace_ship = self.player_ship.hyperspace_ship
         print("Attached module:", self)
+
+    def get_attribute_value(self, attribute_name: str):
+        # more complicated logic will be here in the future.
+        try:
+            return getattr(self, attribute_name)
+        except AttributeError as e:
+            raise NoSuchModuleAttributeException(
+                f"Invalid attribute: {attribute_name} for module {self.module_type}"
+            ) from e
 
 
 class Cockpit(ShipModule):

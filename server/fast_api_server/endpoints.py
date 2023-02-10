@@ -52,10 +52,8 @@ async def set_attr(ship_instruction: ShipInstruction):
 @router.post("/get_attr")
 async def get_attr(ship_reading: ShipReading):
     # TODO validate module and attribute or handle errors
-    module = getattr(
-        router.server.game.simulation.player_ship.modules, ship_reading.module
-    )
-    value = getattr(module, ship_reading.attribute)
+    user_name = "test"
+    value = router.server.game.get_attribute(user_name, ship_reading.module, ship_reading.attribute)
     return {"value": value}
 
 
