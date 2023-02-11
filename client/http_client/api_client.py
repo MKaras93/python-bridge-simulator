@@ -12,6 +12,9 @@ class BaseClient(abc.ABC):
     def get_attribute(self, module: str, attribute: str) -> Any:
         raise NotImplemented()
 
+    def call_method(self, module: str, method: str, **kwargs) -> Any:
+        raise NotImplemented()
+
 
 class APIClient:
     API_URL = "http://localhost:8000"
@@ -44,4 +47,13 @@ class APIClient:
             "attribute": attribute,
         }
         response_data = self._post_request("get_attr", payload)
+        return response_data["value"]
+
+    def call_method(self, module: str, method: str, **kwargs) -> Any:
+        payload = {
+            "module": module,
+            "method": method,
+            "kwargs": kwargs
+        }
+        response_data = self._post_request("call_method", payload)
         return response_data["value"]

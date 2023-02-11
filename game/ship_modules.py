@@ -32,15 +32,22 @@ class ShipModule(abc.ABC):
                 f"Module {self.module_type} doesn't have attribute '{attribute_name}'."
             )
 
-    def read_attr(self, attribute_name: str):
+    def get_attribute(self, attribute_name: str):
         # if anything aside happens during reading, it should happen here.
         self._validate_attribute_name(attribute_name)
         return getattr(self, attribute_name)
 
-    def write_attr(self, attribute_name: str, value: Any):
+    def set_attribute(self, attribute_name: str, value: Any):
         self._validate_attribute_name(attribute_name)
         setattr(self, attribute_name, value)
         return value
+
+    def call_method(self, method_name, **kwargs):
+        self._validate_attribute_name(method_name)  # method is just an attribute - same logic
+        # TODO: think of some argument validation - there would be different validation for each method. Pydantic?
+        method = getattr(self, method_name)
+        return method(**kwargs)
+
 
 
 class Cockpit(ShipModule):
@@ -80,6 +87,12 @@ class Cockpit(ShipModule):
     @hyper_drive_timer.setter
     def hyper_drive_timer(self, value: int):
         self.hyperspace_ship.engine_cut_off_time = value
+
+    def disengage_hyper_drive(self, timer: int = 0):
+        # mocked method to test method calls
+        print(f"Disengaging hyper drive in {timer}")
+        print(f"Hyper drive disengaged!")
+        return True
 
 
 class ShipSubmodule:
