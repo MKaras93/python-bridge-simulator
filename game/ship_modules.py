@@ -48,13 +48,17 @@ class ShipModule(abc.ABC):
         method = getattr(self, method_name)
         return method(**kwargs)
 
+    @property
+    def operators(self):
+        # if no one has permission, every one has permission.
+        return self.player_ship.module_permissions.get(self.module_type, self.player_ship.bridge_crew)
+
+    def log(self, level: str, message: str):
+        self.player_ship.simulation.game.log(level=level, message=message, module=self)
 
 
 class Cockpit(ShipModule):
     module_type = "cockpit"
-
-    def __init__(self):
-        super().__init__()
 
     @property
     def target_angle(self) -> float:
@@ -62,6 +66,8 @@ class Cockpit(ShipModule):
 
     @target_angle.setter
     def target_angle(self, value: float):
+        if value is not None and not self.rotation_drive_percent:
+            self.log("warning", "Target angle set but rotation drive is off.")
         self.hyperspace_ship.target_angle = value
 
     @property
@@ -93,6 +99,21 @@ class Cockpit(ShipModule):
         print(f"Disengaging hyper drive in {timer}")
         print(f"Hyper drive disengaged!")
         return True
+
+
+class Configuration(ShipModule):
+    """
+    Module responsible for different settings, such as permissions to different modules.
+    """
+    module_type = "configuration"
+
+    @property
+    def permissions(self) -> int:
+        return self.player_ship.module_permissions
+
+    @permissions.setter
+    def permissions(self, value: dict):
+        self.player_ship.module_permissions = value
 
 
 class ShipSubmodule:

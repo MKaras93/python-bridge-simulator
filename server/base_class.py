@@ -24,3 +24,9 @@ class BasePythonBridgeSimulatorServer(abc.ABC):
         Run method of the concrete class should run the asynchronous server.
         """
         print("Starting server")
+
+    def log(self, module: str, level: str, message: str, user: str, timestamp: str):
+        """
+        Passes log to the client.
+        """
+        raise NotImplemented

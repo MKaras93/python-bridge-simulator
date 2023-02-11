@@ -36,7 +36,7 @@ class BaseScenario:
         self.game.space.ships.append(hyperspace_ship)
 
         player_ship = PlayerShip(
-            game=self.game,
+            simulation=self.game,
             hyperspace_ship=hyperspace_ship,
         )
         for module in self.PLAYER_SHIP_MODULES:
@@ -90,9 +90,12 @@ class PlayerShipTestScenario(BaseScenario):
     def _setup(self):
         super()._setup()
         self._setup_player_ship()
+        self.game.player_ship.modules.cockpit.target_angle = 50
 
     def play(self, ct: int):
         super().play(ct)
+        if ct % 100 == 0:
+            self.game.player_ship.modules.cockpit.target_angle = 50
         # print(self.game.player_ship.modules.cockpit.target_angle)
         # self.game.player_ship.modules.cockpit.target_angle = 150
         # print(self.game.player_ship.hyperspace_ship.target_angle)
