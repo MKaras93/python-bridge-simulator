@@ -77,14 +77,19 @@ class Game:
         self.simulation.player_ship.modules.validate_module_name(module_name)
         module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
         self._check_permission(module_name, user_name)
-        return module.read_attr(attribute_name)
+        return module.get_attribute(attribute_name)
 
     def set_attribute(self, user_name: str, module_name: str, attribute_name: str, value: Any):
         self.simulation.player_ship.modules.validate_module_name(module_name)
         module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
         self._check_permission(module_name, user_name)
-        return module.write_attr(attribute_name, value)
+        return module.set_attribute(attribute_name, value)
 
+    def call_method(self, user_name:str, module_name: str, method_name: str, **kwargs):
+        self.simulation.player_ship.modules.validate_module_name(module_name)
+        module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
+        self._check_permission(module_name, user_name)
+        return module.call_method(method_name, **kwargs)
 
     def _check_permission(self, module_name: str, user_name: str):
         # TODO

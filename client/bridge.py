@@ -46,6 +46,9 @@ class Cockpit(BaseModule):
     def hyper_drive_timer(self, value: float):
         self._client.set_attribute(self.module_type, "hyper_drive_timer", value)
 
+    def disengage_hyper_drive(self, timer: int = 0):
+        return self._client.call_method(self.module_type, "disengage_hyper_drive", timer=timer)
+
 
 class MotherShip:
     def __init__(self):
