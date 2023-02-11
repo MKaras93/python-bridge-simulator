@@ -1,11 +1,21 @@
+from __future__ import annotations
+
 import abc
-from typing import Union, Any
+
 from urllib import parse
 
 import requests
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from client.bridge import MotherShip
+    from typing import Union, Any
 
 
 class BaseClient(abc.ABC):
+    def __init__(self, mother_ship: MotherShip):
+        self.mother_ship = mother_ship
+
     def set_attribute(self, module: str, attribute: str, value: Any) -> Any:
         raise NotImplemented()
 
@@ -16,10 +26,11 @@ class BaseClient(abc.ABC):
         raise NotImplemented()
 
 
-class APIClient:
+class APIClient(BaseClient):
     API_URL = "http://localhost:8000"
 
-    def __init__(self):
+    def __init__(self, mother_ship):
+        super().__init__(mother_ship)
         self.session = requests.Session()
 
     def _get_request(self, path="", **kwargs):
@@ -39,6 +50,7 @@ class APIClient:
             "value": value,
         }
         response_data = self._post_request("set_attr", payload)
+        self._handle_logging(response_data)
         return response_data["value"]
 
     def get_attribute(self, module: str, attribute: str) -> Any:
@@ -47,6 +59,7 @@ class APIClient:
             "attribute": attribute,
         }
         response_data = self._post_request("get_attr", payload)
+        self._handle_logging(response_data)
         return response_data["value"]
 
     def call_method(self, module: str, method: str, **kwargs) -> Any:
@@ -56,4 +69,15 @@ class APIClient:
             "kwargs": kwargs
         }
         response_data = self._post_request("call_method", payload)
+        self._handle_logging(response_data)
         return response_data["value"]
+
+    def _handle_logging(self, response_data):
+        logs = response_data.get("logs")
+        for log in logs:
+            self.mother_ship.log(module=log["module"],
+                                 level=log["level"],
+                                 message=log["message"],
+                                 user=log["user"],
+                                 timestamp=log["timestamp"])
+

@@ -52,12 +52,15 @@ class Cockpit(BaseModule):
 
 class MotherShip:
     def __init__(self):
-        self._client = CLIENT_CLASS()
+        self._client = CLIENT_CLASS(self)
         self.cockpit: Cockpit = self._add_module(Cockpit)
 
     def _add_module(self, module_class: type):
         module = module_class(self, client=self._client)
         return module
+
+    def log(self, module: str, level: str, message: str, user: str, timestamp: str):
+        print(f"[{timestamp}][{level}][{module.upper()}]: {message}")
 
 
 MS = MotherShip()

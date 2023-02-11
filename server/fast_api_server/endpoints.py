@@ -9,9 +9,6 @@ from game.errors import NoSuchModuleException, NoSuchModuleAttributeException
 router = APIRouter()
 
 
-# TODO: endpoint should only pass value in payload - module name and attribute in path.
-
-
 class SetAttributePayload(BaseModel):
     module: str
     attribute: str
@@ -49,12 +46,15 @@ async def set_attr(set_attribute_payload: SetAttributePayload):
         response = JSONResponse(
             {
                 "module_name": f"Attribute '{set_attribute_payload.attribute}' doesn't exist for module"
-                               f" '{set_attribute_payload.module}'"
+                f" '{set_attribute_payload.module}'"
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     else:
-        response = {"value": value}
+        response = {
+            "value": value,
+            "logs": router.server.get_and_clear_user_log_buffer(user_name),
+        }
 
     return response
 
@@ -76,12 +76,15 @@ async def get_attr(get_attribute_payload: GetAttributePayload):
         response = JSONResponse(
             {
                 "module_name": f"Attribute '{get_attribute_payload.attribute}' doesn't exist for module"
-                               f" '{get_attribute_payload.module}'"
+                f" '{get_attribute_payload.module}'"
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     else:
-        response = {"value": value}
+        response = {
+            "value": value,
+            "logs": router.server.get_and_clear_user_log_buffer(user_name),
+        }
 
     return response
 
@@ -106,11 +109,14 @@ async def call_method(call_method_payload: CallMethodPayload):
         response = JSONResponse(
             {
                 "module_name": f"Method '{call_method_payload.method}' doesn't exist for module"
-                               f" '{call_method_payload.module}'"
+                f" '{call_method_payload.module}'"
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     else:
-        response = {"value": value}
+        response = {
+            "value": value,
+            "logs": router.server.get_and_clear_user_log_buffer(user_name),
+        }
 
     return response
