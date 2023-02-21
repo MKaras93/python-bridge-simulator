@@ -11,10 +11,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from game.loop import Simulation
 
+
 class BaseScenario:
     PLAYER_SHIP_MODULES = [
-            Cockpit(),
-        ]
+        Cockpit(),
+    ]
 
     def __init__(self, game: Simulation):
         self.game: Simulation = game
@@ -94,8 +95,8 @@ class PlayerShipTestScenario(BaseScenario):
 
     def play(self, ct: int):
         super().play(ct)
-        if ct % 100 == 0:
-            self.game.player_ship.modules.cockpit.target_angle = 50
+        # if ct % 100 == 0:
+        #     self.game.player_ship.modules.cockpit.log("error", "Incomming transmission received!")
         # print(self.game.player_ship.modules.cockpit.target_angle)
         # self.game.player_ship.modules.cockpit.target_angle = 150
         # print(self.game.player_ship.hyperspace_ship.target_angle)

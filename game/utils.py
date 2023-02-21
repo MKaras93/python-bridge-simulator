@@ -2,6 +2,7 @@ import math
 import random
 
 import pymunk
+from pymunk import Vec2d
 
 
 def clockwise_degrees_to_anti_clockwise_radian(degrees: float) -> float:
@@ -31,10 +32,10 @@ def get_ship(space: "HyperSpace"):
     return ship
 
 
-def get_sector_coord(coord: float) -> int:
+def get_sector_coords(position):
     SECTOR_SIZE = 10
-    return math.ceil(coord/SECTOR_SIZE)
 
+    def _get_sector_coord(coord: float) -> int:
+        return math.ceil(coord / SECTOR_SIZE)
 
-def get_sector(position):
-    return (get_sector_coord(position.x), get_sector_coord(position.y))
+    return Vec2d(_get_sector_coord(position.x), _get_sector_coord(position.y))
