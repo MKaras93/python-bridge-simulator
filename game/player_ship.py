@@ -5,7 +5,7 @@ from game.ship_panels import ShipPanels
 
 if TYPE_CHECKING:
     from game.loop import Simulation
-    from game.hyperspace import HyperspaceShip, HyperSpace
+    from game.hyperspace import HyperspaceShip, Hyperspace
     from game.ship_panels import ShipPanel
 
 
@@ -18,7 +18,7 @@ class PlayerShip:
     """
     def __init__(self, simulation: Simulation, hyperspace_ship: HyperspaceShip):
         self.simulation: Simulation = simulation
-        self.space: HyperSpace = simulation.space
+        self.space: Hyperspace = simulation.space
         self.hyperspace_ship: HyperspaceShip = hyperspace_ship
         self.panels: ShipPanels = ShipPanels()
         self.panel_names = set()

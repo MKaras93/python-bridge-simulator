@@ -15,12 +15,12 @@ def anticlockwise_radian_to_clockwise_degrees(radians: float) -> float:
     return (450 - inverted_degrees) % 360
 
 
-def create_circle_for_body(space: "HyperSpace", body: pymunk.Body, radius=10):
+def create_circle_for_body(space: "Hyperspace", body: pymunk.Body, radius=10):
     circle = pymunk.Circle(body, radius=radius)
     space.add(circle)
 
 
-def get_ship(space: "HyperSpace"):
+def get_ship(space: "Hyperspace"):
     ship = space.create_ship((random.randint(0, 500), random.randint(0, 500)), 0)
     ship.engine_power = 500
     ship.engine_percent = 10

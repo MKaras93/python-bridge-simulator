@@ -62,7 +62,7 @@ p
 
 # przy okazji, wyklarowała się nowa rzecz: w logu będziemy wyświetlać nazwę modułu, z którego log pochodzi.
 
-# now we need to leave HyperSpace. Assuming it's a habitated space, we need to:
+# now we need to leave Hyperspace. Assuming it's a habitated space, we need to:
 # ask for permission to enter normal space
 # make sure we won't collide with anything. Collision check is valid for 10 seconds.
 

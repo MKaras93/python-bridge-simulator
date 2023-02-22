@@ -8,7 +8,7 @@ import pygame
 import pymunk
 import pymunk.pygame_util
 
-from .hyperspace import HyperSpace
+from .hyperspace import Hyperspace
 from .scenarios import ACTIVE_SCENARIO
 
 if TYPE_CHECKING:
@@ -20,15 +20,15 @@ if TYPE_CHECKING:
 
 class Simulation:
     @staticmethod
-    def _get_space() -> HyperSpace:
-        space = HyperSpace()
+    def _get_space() -> Hyperspace:
+        space = Hyperspace()
         space.gravity = 0, 0
         space.damping = 0.2
         return space
 
     def __init__(self, game: Game):
         self.game: Game = game
-        self.space: HyperSpace = self._get_space()
+        self.space: Hyperspace = self._get_space()
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((1000, 700))
         self.options = pymunk.pygame_util.DrawOptions(self.screen)

@@ -15,7 +15,7 @@ from .utils import (
 )
 
 
-class HyperSpace(pymunk.Space):
+class Hyperspace(pymunk.Space):
     def __init__(self, threaded=False):
         super().__init__(threaded=threaded)
         self.ships: List[HyperspaceShip] = []
@@ -46,7 +46,7 @@ class HyperSpace(pymunk.Space):
 
 
 class HyperspaceShip:
-    def __init__(self, space: Optional[HyperSpace] = None):
+    def __init__(self, space: Optional[Hyperspace] = None):
         self.space = space
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC, mass=1, moment=1)
         self.engine_percent: int = 0
@@ -127,13 +127,13 @@ class HyperspaceShip:
         self.sector = None
 
     @property
-    def in_hyper_space(self):
+    def in_hyperspace(self):
         return self.sector is None
 
     def tick(self):
         # TODO: Firstly use panels to generate physical phenomenons
         # TODO: Secondly, use the tick of each physical phenomenon
-        if self.in_hyper_space:
+        if self.in_hyperspace:
             self._rotate()
             self._add_engine_force()
         else:

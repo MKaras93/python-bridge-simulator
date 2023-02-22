@@ -4,7 +4,7 @@ import pymunk
 import pyglet
 from pymunk.pyglet_util import DrawOptions
 
-from game.hyperspace import HyperSpace
+from game.hyperspace import Hyperspace
 
 
 options = DrawOptions()
@@ -13,7 +13,7 @@ window = pyglet.window.Window(800, 600, "Brackets")
 
 
 # space
-space = HyperSpace()
+space = Hyperspace()
 space.gravity = 0, 0
 space.damping = 0.2
 ct = 0
