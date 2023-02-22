@@ -36,7 +36,7 @@ MS.thrusters.cut_off_time = 20 # turn off engine after 20 seconds
 # we are flying!
 
 
-# okej, jak będziemy o tym myśleć per module, to jest trochę łatwiej - ustalamy, jakie atrybut i funkcje ma każdy z modułów.
+# okej, jak będziemy o tym myśleć per panel, to jest trochę łatwiej - ustalamy, jakie atrybut i funkcje ma każdy z modułów.
 # ale jedźmy dalej, miałem tu parę sytuacji jeszcze do przetestowania
 # może idźmy dalej, w końcu trzeba gdzieś wylądować:
 
@@ -95,7 +95,7 @@ print(last_transmission.text)
 # Safe travels,
 # Jordan's Dock."
 
-# Also, the station might list commodities or modules which are forbidden here and ask the crew if they have them. The crew might lie.
+# Also, the station might list commodities or panels which are forbidden here and ask the crew if they have them. The crew might lie.
 # Station might later check that, or might not.
 
 # we can also check:
@@ -104,12 +104,12 @@ transmission.details["safe_coordinates"]
 
 
 # hm. I think pilot should only have access to controller, not the engine or thrusters. Engineer should have access to
-# engine or thruster. So modules cooperate with each other - controller sets something on the engine. Controller might work properly, but engine might not -
+# engine or thruster. So panels cooperate with each other - controller sets something on the engine. Controller might work properly, but engine might not -
 # engine might give wrong data.
 
 # PILOT:
 MS.control.normal_space_coords = (-98.57, 45.32)
-# moving between hyperspace and normal space is risky - some modules should be turned off or they might get damaged,
+# moving between hyperspace and normal space is risky - some panels should be turned off or they might get damaged,
 # so the pilot or captain should ask to prepare for disengagement.
 
 # e.g. Engineer may want to turn off shields or thrusters or something
@@ -118,9 +118,9 @@ MS.engine.running=False
 # Comms might want to turn off receiver:
 MS.receiver.running = False
 
-# modules should have attribute: Hyperspace transition safety, which shows percentage of some kind of failure if the device
+# panels should have attribute: Hyperspace transition safety, which shows percentage of some kind of failure if the device
 # is active during hyperspace transition.
-# crew can run module.condition to display a dict with all data about the module, including hyperspace_transition_safety.
+# crew can run panel.condition to display a dict with all data about the panel, including hyperspace_transition_safety.
 
 # CAPTAIN: Is crew ready to enter normal space?
 # CREW: ready.

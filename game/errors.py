@@ -1,6 +1,6 @@
-class NoSuchModuleAttributeException(Exception):
+class NoSuchPanelAttributeException(Exception):
     pass
 
 
-class NoSuchModuleException(Exception):
+class NoSuchPanelException(Exception):
     pass

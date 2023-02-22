@@ -30,11 +30,11 @@ class PythonBridgeSimulatorHttpServer(BasePythonBridgeSimulatorServer):
         await super().run()
         await self.server.serve()
 
-    def log(self, module: str, level: str, message: str, user: str, timestamp: str):
+    def log(self, panel: str, level: str, message: str, user: str, timestamp: str):
         user_buffer = self.log_buffers.setdefault(user, [])
 
         log_data = {
-            "module": module,
+            "panel": panel,
             "level": level,
             "message": message,
             "timestamp": timestamp,

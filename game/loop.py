@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from typing import Optional, Any
     from game.player_ship import PlayerShip
     from server.base_class import BasePythonBridgeSimulatorServer
-    from .ship_panels import ShipModule
+    from .ship_panels import ShipPanel
 
 
 class Simulation:
@@ -76,37 +76,37 @@ class Game:
         print(f"Attaching game to {server}")
         self.server = server
 
-    def get_attribute(self, user_name: str, module_name: str, attribute_name: str):
-        self.simulation.player_ship.modules.validate_module_name(module_name)
-        module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
-        self._check_permission(module, user_name)
-        return module.get_attribute(attribute_name)
+    def get_attribute(self, user_name: str, panel_name: str, attribute_name: str):
+        self.simulation.player_ship.panels.validate_panel_name(panel_name)
+        panel: ShipPanel = getattr(self.simulation.player_ship.panels, panel_name)
+        self._check_permission(panel, user_name)
+        return panel.get_attribute(attribute_name)
 
-    def set_attribute(self, user_name: str, module_name: str, attribute_name: str, value: Any):
-        self.simulation.player_ship.modules.validate_module_name(module_name)
-        module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
-        self._check_permission(module, user_name)
-        return module.set_attribute(attribute_name, value)
+    def set_attribute(self, user_name: str, panel_name: str, attribute_name: str, value: Any):
+        self.simulation.player_ship.panels.validate_panel_name(panel_name)
+        panel: ShipPanel = getattr(self.simulation.player_ship.panels, panel_name)
+        self._check_permission(panel, user_name)
+        return panel.set_attribute(attribute_name, value)
 
-    def call_method(self, user_name: str, module_name: str, method_name: str, **kwargs):
-        self.simulation.player_ship.modules.validate_module_name(module_name)
-        module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
-        self._check_permission(module, user_name)
-        return module.call_method(method_name, **kwargs)
+    def call_method(self, user_name: str, panel_name: str, method_name: str, **kwargs):
+        self.simulation.player_ship.panels.validate_panel_name(panel_name)
+        panel: ShipPanel = getattr(self.simulation.player_ship.panels, panel_name)
+        self._check_permission(panel, user_name)
+        return panel.call_method(method_name, **kwargs)
 
-    def log(self, level: str, message: str, module_name: str = "", module: ShipModule = None):
-        if module_name:  # Either module or module_name is required. They can't be provided together.
-            if module:
-                raise ValueError("You have to provide either 'module' or 'module_name' parameters, not both.")
-            module: ShipModule = getattr(self.simulation.player_ship.modules, module_name)
-        elif not module:
-            raise ValueError("Either 'module' or 'module_name' must be provided.")
+    def log(self, level: str, message: str, panel_name: str = "", panel: ShipPanel = None):
+        if panel_name:  # Either panel or panel_name is required. They can't be provided together.
+            if panel:
+                raise ValueError("You have to provide either 'panel' or 'panel_name' parameters, not both.")
+            panel: ShipPanel = getattr(self.simulation.player_ship.panels, panel_name)
+        elif not panel:
+            raise ValueError("Either 'panel' or 'panel_name' must be provided.")
 
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        for user in module.operators:
-            self.server.log(module.module_type, level, message, user, timestamp)
-        print(f"[{timestamp}][{level}][{module_name.upper()}]: {message}")
+        for user in panel.operators:
+            self.server.log(panel.panel_type, level, message, user, timestamp)
+        print(f"[{timestamp}][{level}][{panel_name.upper()}]: {message}")
 
     @staticmethod
-    def _check_permission(module: ShipModule, user_name: str) -> bool:
-        return user_name in module.operators
+    def _check_permission(panel: ShipPanel, user_name: str) -> bool:
+        return user_name in panel.operators

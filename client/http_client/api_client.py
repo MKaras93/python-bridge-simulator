@@ -16,13 +16,13 @@ class BaseClient(abc.ABC):
     def __init__(self, mother_ship: MotherShip):
         self.mother_ship = mother_ship
 
-    def set_attribute(self, module: str, attribute: str, value: Any) -> Any:
+    def set_attribute(self, panel: str, attribute: str, value: Any) -> Any:
         raise NotImplemented()
 
-    def get_attribute(self, module: str, attribute: str) -> Any:
+    def get_attribute(self, panel: str, attribute: str) -> Any:
         raise NotImplemented()
 
-    def call_method(self, module: str, method: str, **kwargs) -> Any:
+    def call_method(self, panel: str, method: str, **kwargs) -> Any:
         raise NotImplemented()
 
 
@@ -43,9 +43,9 @@ class APIClient(BaseClient):
         response = self.session.post(url, json=payload, params=kwargs)
         return response.json()
 
-    def set_attribute(self, module: str, attribute: str, value: Any) -> Any:
+    def set_attribute(self, panel: str, attribute: str, value: Any) -> Any:
         payload = {
-            "module": module,
+            "panel": panel,
             "attribute": attribute,
             "value": value,
         }
@@ -53,18 +53,18 @@ class APIClient(BaseClient):
         self._handle_logging(response_data)
         return response_data["value"]
 
-    def get_attribute(self, module: str, attribute: str) -> Any:
+    def get_attribute(self, panel: str, attribute: str) -> Any:
         payload = {
-            "module": module,
+            "panel": panel,
             "attribute": attribute,
         }
         response_data = self._post_request("get_attr", payload)
         self._handle_logging(response_data)
         return response_data["value"]
 
-    def call_method(self, module: str, method: str, **kwargs) -> Any:
+    def call_method(self, panel: str, method: str, **kwargs) -> Any:
         payload = {
-            "module": module,
+            "panel": panel,
             "method": method,
             "kwargs": kwargs
         }
@@ -75,7 +75,7 @@ class APIClient(BaseClient):
     def _handle_logging(self, response_data):
         logs = response_data.get("logs")
         for log in logs:
-            self.mother_ship.log(module=log["module"],
+            self.mother_ship.log(panel=log["panel"],
                                  level=log["level"],
                                  message=log["message"],
                                  user=log["user"],

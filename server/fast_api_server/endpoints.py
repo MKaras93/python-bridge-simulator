@@ -4,24 +4,24 @@ from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from game.errors import NoSuchModuleException, NoSuchModuleAttributeException
+from game.errors import NoSuchPanelException, NoSuchPanelAttributeException
 
 router = APIRouter()
 
 
 class SetAttributePayload(BaseModel):
-    module: str
+    panel: str
     attribute: str
     value: Any
 
 
 class GetAttributePayload(BaseModel):
-    module: str
+    panel: str
     attribute: str
 
 
 class CallMethodPayload(BaseModel):
-    module: str
+    panel: str
     method: str
     kwargs: dict
 
@@ -33,20 +33,20 @@ async def set_attr(set_attribute_payload: SetAttributePayload):
     try:
         value = router.server.game.set_attribute(
             user_name,
-            set_attribute_payload.module,
+            set_attribute_payload.panel,
             set_attribute_payload.attribute,
             set_attribute_payload.value,
         )
-    except NoSuchModuleException:
+    except NoSuchPanelException:
         response = JSONResponse(
-            {"module_name": f"Module '{set_attribute_payload.module}' doesn't exist."},
+            {"panel_name": f"Panel '{set_attribute_payload.panel}' doesn't exist."},
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    except NoSuchModuleAttributeException:
+    except NoSuchPanelAttributeException:
         response = JSONResponse(
             {
-                "module_name": f"Attribute '{set_attribute_payload.attribute}' doesn't exist for module"
-                f" '{set_attribute_payload.module}'"
+                "panel_name": f"Attribute '{set_attribute_payload.attribute}' doesn't exist for panel"
+                f" '{set_attribute_payload.panel}'"
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -65,18 +65,18 @@ async def get_attr(get_attribute_payload: GetAttributePayload):
 
     try:
         value = router.server.game.get_attribute(
-            user_name, get_attribute_payload.module, get_attribute_payload.attribute
+            user_name, get_attribute_payload.panel, get_attribute_payload.attribute
         )
-    except NoSuchModuleException:
+    except NoSuchPanelException:
         response = JSONResponse(
-            {"module_name": f"Module '{get_attribute_payload.module}' doesn't exist."},
+            {"panel_name": f"Panel '{get_attribute_payload.panel}' doesn't exist."},
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    except NoSuchModuleAttributeException:
+    except NoSuchPanelAttributeException:
         response = JSONResponse(
             {
-                "module_name": f"Attribute '{get_attribute_payload.attribute}' doesn't exist for module"
-                f" '{get_attribute_payload.module}'"
+                "panel_name": f"Attribute '{get_attribute_payload.attribute}' doesn't exist for panel"
+                f" '{get_attribute_payload.panel}'"
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -96,20 +96,20 @@ async def call_method(call_method_payload: CallMethodPayload):
     try:
         value = router.server.game.call_method(
             user_name,
-            call_method_payload.module,
+            call_method_payload.panel,
             call_method_payload.method,
             **call_method_payload.kwargs,
         )
-    except NoSuchModuleException:
+    except NoSuchPanelException:
         response = JSONResponse(
-            {"module_name": f"Module '{call_method_payload.module}' doesn't exist."},
+            {"panel_name": f"Panel '{call_method_payload.panel}' doesn't exist."},
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    except NoSuchModuleAttributeException:
+    except NoSuchPanelAttributeException:
         response = JSONResponse(
             {
-                "module_name": f"Method '{call_method_payload.method}' doesn't exist for module"
-                f" '{call_method_payload.module}'"
+                "panel_name": f"Method '{call_method_payload.method}' doesn't exist for panel"
+                f" '{call_method_payload.panel}'"
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )

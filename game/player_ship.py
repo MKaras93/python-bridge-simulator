@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from game.ship_panels import ShipModules
+from game.ship_panels import ShipPanels
 
 if TYPE_CHECKING:
     from game.loop import Simulation
     from game.hyperspace import HyperspaceShip, HyperSpace
-    from game.ship_panels import ShipModule
+    from game.ship_panels import ShipPanel
 
 
 class PlayerShip:
@@ -20,15 +20,15 @@ class PlayerShip:
         self.simulation: Simulation = simulation
         self.space: HyperSpace = simulation.space
         self.hyperspace_ship: HyperspaceShip = hyperspace_ship
-        self.modules: ShipModules = ShipModules()
-        self.module_names = set()
+        self.panels: ShipPanels = ShipPanels()
+        self.panel_names = set()
         self.bridge_crew = [
             # TODO: placeholder for usernames of the bridge crew members
             "test",
         ]
-        self.module_permissions = {}
+        self.panel_permissions = {}
 
-    def add_module(self, module: ShipModule):
-        setattr(self.modules, module.module_type, module)
-        self.module_names.add(module.module_type)
-        module.attach_to_ship(self)
+    def add_panel(self, panel: ShipPanel):
+        setattr(self.panels, panel.panel_type, panel)
+        self.panel_names.add(panel.panel_type)
+        panel.attach_to_ship(self)

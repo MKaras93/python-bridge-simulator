@@ -25,7 +25,7 @@ class BasePythonBridgeSimulatorServer(abc.ABC):
         """
         print("Starting server")
 
-    def log(self, module: str, level: str, message: str, user: str, timestamp: str):
+    def log(self, panel: str, level: str, message: str, user: str, timestamp: str):
         """
         Passes log to the client.
         """

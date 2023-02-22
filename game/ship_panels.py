@@ -5,8 +5,8 @@ from typing import Optional, Any
 from typing import TYPE_CHECKING
 
 from game.errors import (
-    NoSuchModuleAttributeException,
-    NoSuchModuleException,
+    NoSuchPanelAttributeException,
+    NoSuchPanelException,
 )
 
 if TYPE_CHECKING:
@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from game.player_ship import PlayerShip
 
 
-class ShipModule(abc.ABC):
-    module_type = None
+class ShipPanel(abc.ABC):
+    panel_type = None
 
     def __init__(self):
         self.player_ship: Optional[PlayerShip] = None
@@ -24,12 +24,12 @@ class ShipModule(abc.ABC):
     def attach_to_ship(self, player_ship: PlayerShip):
         self.player_ship = player_ship
         self.hyperspace_ship = self.player_ship.hyperspace_ship
-        print("Attached module:", self)
+        print("Attached panel:", self)
 
     def _validate_attribute_name(self, attribute_name: str):
         if attribute_name.startswith("_") or not hasattr(self, attribute_name):
-            raise NoSuchModuleAttributeException(
-                f"Module {self.module_type} doesn't have attribute '{attribute_name}'."
+            raise NoSuchPanelAttributeException(
+                f"Panel {self.panel_type} doesn't have attribute '{attribute_name}'."
             )
 
     def get_attribute(self, attribute_name: str):
@@ -51,14 +51,14 @@ class ShipModule(abc.ABC):
     @property
     def operators(self):
         # if no one has permission, every one has permission.
-        return self.player_ship.module_permissions.get(self.module_type, self.player_ship.bridge_crew)
+        return self.player_ship.panel_permissions.get(self.panel_type, self.player_ship.bridge_crew)
 
     def log(self, level: str, message: str):
-        self.player_ship.simulation.game.log(level=level, message=message, module=self)
+        self.player_ship.simulation.game.log(level=level, message=message, panel=self)
 
 
-class Cockpit(ShipModule):
-    module_type = "cockpit"
+class Cockpit(ShipPanel):
+    panel_type = "cockpit"
 
     @property
     def target_angle(self) -> float:
@@ -101,29 +101,29 @@ class Cockpit(ShipModule):
         return True
 
 
-class Configuration(ShipModule):
+class Configuration(ShipPanel):
     """
-    Module responsible for different settings, such as permissions to different modules.
+    Panel responsible for different settings, such as permissions to different panels.
     """
-    module_type = "configuration"
+    panel_type = "configuration"
 
     @property
     def permissions(self) -> int:
-        return self.player_ship.module_permissions
+        return self.player_ship.panel_permissions
 
     @permissions.setter
     def permissions(self, value: dict):
-        self.player_ship.module_permissions = value
+        self.player_ship.panel_permissions = value
 
 
-class ShipSubmodule:
+class ShipSubpanel:
     pass
 
 
-class ShipModules:
+class ShipPanels:
     def __init__(self):
         self.cockpit = Optional[Cockpit]
 
-    def validate_module_name(self, module_name: str):
-        if module_name.startswith("_") or not hasattr(self, module_name):
-            raise NoSuchModuleException(f"Module '{module_name}' does not exist.")
+    def validate_panel_name(self, panel_name: str):
+        if panel_name.startswith("_") or not hasattr(self, panel_name):
+            raise NoSuchPanelException(f"Panel '{panel_name}' does not exist.")

@@ -131,7 +131,7 @@ class HyperspaceShip:
         return self.sector is None
 
     def tick(self):
-        # TODO: Firstly use modules to generate physical phenomenons
+        # TODO: Firstly use panels to generate physical phenomenons
         # TODO: Secondly, use the tick of each physical phenomenon
         if self.in_hyper_space:
             self._rotate()

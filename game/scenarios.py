@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class BaseScenario:
-    PLAYER_SHIP_MODULES = [
+    PLAYER_SHIP_PANELS = [
         Cockpit(),
     ]
 
@@ -40,8 +40,8 @@ class BaseScenario:
             simulation=self.game,
             hyperspace_ship=hyperspace_ship,
         )
-        for module in self.PLAYER_SHIP_MODULES:
-            player_ship.add_module(module)
+        for panel in self.PLAYER_SHIP_PANELS:
+            player_ship.add_panel(panel)
 
         self.game.player_ship = player_ship
 
@@ -91,14 +91,14 @@ class PlayerShipTestScenario(BaseScenario):
     def _setup(self):
         super()._setup()
         self._setup_player_ship()
-        self.game.player_ship.modules.cockpit.target_angle = 50
+        self.game.player_ship.panels.cockpit.target_angle = 50
 
     def play(self, ct: int):
         super().play(ct)
         # if ct % 100 == 0:
-        #     self.game.player_ship.modules.cockpit.log("error", "Incomming transmission received!")
-        # print(self.game.player_ship.modules.cockpit.target_angle)
-        # self.game.player_ship.modules.cockpit.target_angle = 150
+        #     self.game.player_ship.panels.cockpit.log("error", "Incomming transmission received!")
+        # print(self.game.player_ship.panels.cockpit.target_angle)
+        # self.game.player_ship.panels.cockpit.target_angle = 150
         # print(self.game.player_ship.hyperspace_ship.target_angle)
 
 
