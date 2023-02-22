@@ -13,7 +13,7 @@ from .scenarios import ACTIVE_SCENARIO
 
 if TYPE_CHECKING:
     from typing import Optional, Any
-    from game.player_ship import PlayerShip
+    from .internal_ship.classes import InternalShip
     from server.base_class import BasePythonBridgeSimulatorServer
     from .ship_panels import ShipPanel
 
@@ -33,7 +33,7 @@ class Simulation:
         self.screen = pygame.display.set_mode((1000, 700))
         self.options = pymunk.pygame_util.DrawOptions(self.screen)
         self.ct = 0
-        self.player_ship: Optional[PlayerShip] = None
+        self.player_ship: Optional[InternalShip] = None
         self.scenario = ACTIVE_SCENARIO(self)
         pygame.init()
 
@@ -54,12 +54,17 @@ class Simulation:
             self.space.debug_draw(self.options)
             for event in pygame.event.get():
                 if (
-                        event.type == pygame.QUIT
-                        or event.type == pygame.KEYDOWN
-                        and (event.key in [pygame.K_ESCAPE, pygame.K_q])
+                    event.type == pygame.QUIT
+                    or event.type == pygame.KEYDOWN
+                    and (event.key in [pygame.K_ESCAPE, pygame.K_q])
                 ):
                     print("Game Over!")
                     quit()
+
+    def create_internal_ship(
+        self,
+    ) -> InternalShip:
+        return InternalShip(self)
 
 
 class Game:
@@ -82,7 +87,9 @@ class Game:
         self._check_permission(panel, user_name)
         return panel.get_attribute(attribute_name)
 
-    def set_attribute(self, user_name: str, panel_name: str, attribute_name: str, value: Any):
+    def set_attribute(
+        self, user_name: str, panel_name: str, attribute_name: str, value: Any
+    ):
         self.simulation.player_ship.panels.validate_panel_name(panel_name)
         panel: ShipPanel = getattr(self.simulation.player_ship.panels, panel_name)
         self._check_permission(panel, user_name)
@@ -94,10 +101,16 @@ class Game:
         self._check_permission(panel, user_name)
         return panel.call_method(method_name, **kwargs)
 
-    def log(self, level: str, message: str, panel_name: str = "", panel: ShipPanel = None):
-        if panel_name:  # Either panel or panel_name is required. They can't be provided together.
+    def log(
+        self, level: str, message: str, panel_name: str = "", panel: ShipPanel = None
+    ):
+        if (
+            panel_name
+        ):  # Either panel or panel_name is required. They can't be provided together.
             if panel:
-                raise ValueError("You have to provide either 'panel' or 'panel_name' parameters, not both.")
+                raise ValueError(
+                    "You have to provide either 'panel' or 'panel_name' parameters, not both."
+                )
             panel: ShipPanel = getattr(self.simulation.player_ship.panels, panel_name)
         elif not panel:
             raise ValueError("Either 'panel' or 'panel_name' must be provided.")

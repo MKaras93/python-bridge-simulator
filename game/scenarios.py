@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 
 from game.hyperspace import HyperspaceShip
-from game.player_ship import PlayerShip
+from game.internal_ship.classes import InternalShip
 from game.ship_panels import Cockpit
 
 from typing import TYPE_CHECKING
@@ -30,18 +30,20 @@ class BaseScenario:
 
     def _setup_player_ship(self):
         print("adding player ship")
-        starting_coords = (500, 500)
-        hyperspace_ship: HyperspaceShip = self.game.space.create_ship(starting_coords)
-        hyperspace_ship.engine_percent = 0
-        hyperspace_ship.rotation_engine_percent = 0
-        self.game.space.ships.append(hyperspace_ship)
-
-        player_ship = PlayerShip(
+        print("setting up internal ship for player ship")
+        player_ship = InternalShip(
             simulation=self.game,
-            hyperspace_ship=hyperspace_ship,
         )
         for panel in self.PLAYER_SHIP_PANELS:
             player_ship.add_panel(panel)
+        player_ship.engine_percent = 0
+        player_ship.rotation_engine_percent = 0
+
+        print("setting up hyperspace ship for player ship")
+        starting_position = (500, 500)
+        player_ship.create_hyperspace_ship(starting_position)
+        # self.game.space.ships.append(hyperspace_ship)
+        # player_ship.hyperspace_ship = hyperspace_ship
 
         self.game.player_ship = player_ship
 
@@ -91,7 +93,7 @@ class PlayerShipTestScenario(BaseScenario):
     def _setup(self):
         super()._setup()
         self._setup_player_ship()
-        self.game.player_ship.panels.cockpit.target_angle = 50
+        self.game.player_ship.target_angle = 50
 
     def play(self, ct: int):
         super().play(ct)

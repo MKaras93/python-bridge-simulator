@@ -1,5 +1,4 @@
 import math
-import random
 
 import pymunk
 from pymunk import Vec2d
@@ -18,18 +17,6 @@ def anticlockwise_radian_to_clockwise_degrees(radians: float) -> float:
 def create_circle_for_body(space: "Hyperspace", body: pymunk.Body, radius=10):
     circle = pymunk.Circle(body, radius=radius)
     space.add(circle)
-
-
-def get_ship(space: "Hyperspace"):
-    ship = space.create_ship((random.randint(0, 500), random.randint(0, 500)), 0)
-    ship.engine_power = 500
-    ship.engine_percent = 10
-    create_circle_for_body(space, ship.body)
-    ship.rotation_engine_power = 90
-    ship.rotation_engine_percent = 50
-    ship.angle = 0
-    ship.target_angle = 160
-    return ship
 
 
 def get_sector_coords(position):
