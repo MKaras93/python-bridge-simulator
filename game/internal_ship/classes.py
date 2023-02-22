@@ -5,7 +5,7 @@ import typing
 from pymunk import Vec2d
 
 from game.hyperspace.classes import HyperspaceShip
-from game.ship_panels import ShipPanels, ShipPanel
+from game.internal_ship.ship_panels import ShipPanels, ShipPanel
 
 if typing.TYPE_CHECKING:
     from game.core import Simulation

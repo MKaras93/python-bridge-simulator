@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 
 from game.internal_ship.classes import InternalShip
-from game.ship_panels import Cockpit
+from game.internal_ship.ship_panels import Cockpit
 
 from typing import TYPE_CHECKING
 

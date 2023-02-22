@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from typing import Optional, Any
     from .internal_ship.classes import InternalShip
     from server.base_class import BasePythonBridgeSimulatorServer
-    from .ship_panels import ShipPanel
+    from game.internal_ship.ship_panels import ShipPanel
 
 
 class Simulation:

@@ -8,7 +8,7 @@ import pymunk
 
 from pymunk import Vec2d
 
-from game.hyperspace_legacy import Sector
+from game.sectors.classes import Sector
 from game.utils import (
     anticlockwise_radian_to_clockwise_degrees,
     clockwise_degrees_to_anti_clockwise_radian,
