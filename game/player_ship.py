@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from game.ship_panels import ShipPanels
 
 if TYPE_CHECKING:
-    from game.loop import Simulation
+    from game.core import Simulation
     from game.hyperspace import HyperspaceShip, Hyperspace
     from game.ship_panels import ShipPanel
 

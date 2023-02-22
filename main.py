@@ -2,7 +2,7 @@
 
 import asyncio
 
-from game.loop import Game
+from game.core import Game
 from server.fast_api_server.fast_api_server import PythonBridgeSimulatorHttpServer
 
 SERVER_CLASS = PythonBridgeSimulatorHttpServer  # If you want to use a different server class, use it here.

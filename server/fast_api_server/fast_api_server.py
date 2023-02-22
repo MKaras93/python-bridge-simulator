@@ -8,7 +8,7 @@ from uvicorn import Config, Server
 from server.base_class import BasePythonBridgeSimulatorServer
 
 if TYPE_CHECKING:
-    from game.loop import Game
+    from game.core import Game
     from asyncio import AbstractEventLoop
 
 

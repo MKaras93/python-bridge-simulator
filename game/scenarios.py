@@ -9,7 +9,7 @@ from game.ship_panels import Cockpit
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from game.loop import Simulation
+    from game.core import Simulation
 
 
 class BaseScenario:
