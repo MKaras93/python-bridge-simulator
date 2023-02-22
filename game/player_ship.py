@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from game.ship_modules import ShipModules
+from game.ship_panels import ShipModules
 
 if TYPE_CHECKING:
     from game.loop import Simulation
     from game.hyperspace import HyperspaceShip, HyperSpace
-    from game.ship_modules import ShipModule
+    from game.ship_panels import ShipModule
 
 
 class PlayerShip:

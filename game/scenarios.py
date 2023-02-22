@@ -4,7 +4,7 @@ import random
 
 from game.hyperspace import HyperspaceShip
 from game.player_ship import PlayerShip
-from game.ship_modules import Cockpit
+from game.ship_panels import Cockpit
 
 from typing import TYPE_CHECKING
 
