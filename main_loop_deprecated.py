@@ -4,8 +4,7 @@ import pymunk
 import pyglet
 from pymunk.pyglet_util import DrawOptions
 
-from game.hyperspace import Hyperspace
-
+from game.hyperspace.classes import Hyperspace
 
 options = DrawOptions()
 

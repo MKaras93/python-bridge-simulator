@@ -1,22 +1,24 @@
 from __future__ import annotations
 
 import datetime
-import typing
-from enum import Enum
-
 import math
+import typing
+
 import pymunk
+
 from pymunk import Vec2d
 
-from .utils import (
-    clockwise_degrees_to_anti_clockwise_radian,
+from game.hyperspace_legacy import Sector
+from game.utils import (
     anticlockwise_radian_to_clockwise_degrees,
+    clockwise_degrees_to_anti_clockwise_radian,
     get_sector_coords,
 )
 
+
 if typing.TYPE_CHECKING:
-    from .internal_ship.classes import InternalShip
-    from typing import Tuple, List, Optional
+    from typing import List, Optional
+    from game.internal_ship.classes import InternalShip
 
 
 class Hyperspace(pymunk.Space):
@@ -52,6 +54,7 @@ class HyperspaceShip:
         self.body.angle = clockwise_degrees_to_anti_clockwise_radian(value)
 
     def _cut_off_engine(self):
+        # TODO: move to modules or panels behaviour
         self.internal_ship.engine_percent = 0
         self.internal_ship.engine_cut_off_time = None
 
@@ -59,7 +62,11 @@ class HyperspaceShip:
         if self.internal_ship.engine_percent == 0:
             return
         else:
-            speed = self.internal_ship.engine_percent / 100 * self.internal_ship.engine_power
+            speed = (
+                self.internal_ship.engine_percent
+                / 100
+                * self.internal_ship.engine_power
+            )
             force_vector = Vec2d(speed, 0)
             self.body.apply_force_at_local_point(force_vector)
 
@@ -84,7 +91,9 @@ class HyperspaceShip:
             self.body.angular_velocity = 0
         else:
             angular_velocity = (
-                self.internal_ship.rotation_engine_power * self.internal_ship.rotation_engine_percent / 100
+                self.internal_ship.rotation_engine_power
+                * self.internal_ship.rotation_engine_percent
+                / 100
             )
             angular_velocity = (
                 -angular_velocity if angular_diff > 0 else angular_velocity
@@ -119,42 +128,3 @@ class HyperspaceShip:
             self._add_engine_force()
         else:
             pass
-
-
-class Sector:
-    sectors_map = {}
-
-    def __init__(self, position: Vec2d):
-        self.ships = set()
-        self.structures = set()
-        self.allegiance = None
-        self._position = position
-        self.name = "Sector {}".format(position)
-        self.state = SectorStateEnum.LOADED
-        self.sectors_map[position] = self
-
-    @classmethod
-    def get_sector(cls, position: Vec2d):
-        sector = cls.sectors_map.get((position.x, position.y), None)
-        if not sector:
-            sector = cls(position)
-        return sector
-
-    @property
-    def x(self):
-        return self._position.x
-
-    @property
-    def y(self):
-        return self._position.y
-
-    def add_ship(self, ship: HyperspaceShip):
-        self.ships.add(ship)
-
-    def remove_ship(self, ship: HyperspaceShip):
-        self.ships.remove(ship)
-
-
-class SectorStateEnum(str, Enum):
-    #  Note: optimization potential here, switching to int enum might reduce the cost of storing a sector.
-    LOADED = "loaded"

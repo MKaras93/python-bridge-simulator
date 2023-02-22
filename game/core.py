@@ -8,7 +8,7 @@ import pygame
 import pymunk
 import pymunk.pygame_util
 
-from .hyperspace import Hyperspace
+from .hyperspace.classes import Hyperspace
 from .scenarios import ACTIVE_SCENARIO
 
 if TYPE_CHECKING:

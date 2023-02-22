@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import random
 
-from game.hyperspace import HyperspaceShip
 from game.internal_ship.classes import InternalShip
 from game.ship_panels import Cockpit
 
@@ -10,6 +9,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from game.core import Simulation
+    from game.hyperspace.classes import HyperspaceShip
 
 
 class BaseScenario:
