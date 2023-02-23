@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 
-from game.internal_ship.classes import InternalShip
+from game.internal_ship.classes import InternalShip, Hypersphere, PhenomenonState
 from game.internal_ship.ship_panels import Cockpit
 
 from typing import TYPE_CHECKING
@@ -103,5 +103,19 @@ class PlayerShipTestScenario(BaseScenario):
         # self.game.player_ship.panels.cockpit.target_angle = 150
         # print(self.game.player_ship.hyperspace_ship.target_angle)
 
+class HypersphereTestScenario(BaseScenario):
+    def _setup(self):
+        super()._setup()
+        self._setup_player_ship()
+        self.game.player_ship.target_angle = 50
 
-ACTIVE_SCENARIO = PlayerShipTestScenario
+    def play(self, ct: int):
+        super().play(ct)
+        if ct % 100 == 0:
+            Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
+        # print(self.game.player_ship.panels.cockpit.target_angle)
+        # self.game.player_ship.panels.cockpit.target_angle = 150
+        # print(self.game.player_ship.hyperspace_ship.target_angle)
+
+
+ACTIVE_SCENARIO = HypersphereTestScenario

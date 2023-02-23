@@ -22,6 +22,7 @@ class InternalShip:
 
     def __init__(self, simulation: Simulation):
         self.simulation: Simulation = simulation
+        self.simulation.internal_ships.add(self)
         self.space: Hyperspace = simulation.space
         self.hyperspace_ship: typing.Optional[HyperspaceShip] = None
         self.sector_ship: typing.Optional[SectorShip] = None
@@ -72,16 +73,25 @@ class InternalShip:
 class PhenomenonState(str, Enum):
     PENDING = "pending"
     ACTIVE = "active"
+    DELETED = "deleted"
 
 
 class Hypersphere:
     def __init__(self, ship: InternalShip, power: int, state: PhenomenonState.PENDING):
+        print("New Hypersphere created")
         self.ship: InternalShip = ship
+        self.ship.hypersphere = self
         self.power: int = power
         self.state: PhenomenonState = state
+        self.simulation = self.ship.simulation
+        self.simulation.phenomenons.add(self)
 
     def tick(self):
+        if self.state == PhenomenonState.PENDING:
+            self.activate()
+
         self.power -= 1
+        print(f"Hypersphere has {self.power} power left")
         if self.power <= 0:
             self.destroy()
 
@@ -89,8 +99,10 @@ class Hypersphere:
         self.power += value
 
     def activate(self):
+        print("Activating pending hypersphere")
         self.state = PhenomenonState.ACTIVE
 
     def destroy(self):
         self.ship.hypersphere = None
         self.ship = None
+        self.state = PhenomenonState.DELETED

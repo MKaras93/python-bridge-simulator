@@ -10,10 +10,11 @@ import pymunk.pygame_util
 
 from .hyperspace.classes import Hyperspace
 from .scenarios import ACTIVE_SCENARIO
+from .internal_ship.classes import PhenomenonState
 
 if TYPE_CHECKING:
     from typing import Optional, Any
-    from .internal_ship.classes import InternalShip
+    from .internal_ship.classes import InternalShip, Hypersphere
     from server.base_class import BasePythonBridgeSimulatorServer
     from game.internal_ship.ship_panels import ShipPanel
 
@@ -34,6 +35,9 @@ class Simulation:
         self.options = pymunk.pygame_util.DrawOptions(self.screen)
         self.ct = 0
         self.player_ship: Optional[InternalShip] = None
+        self.internal_ships: set[InternalShip] = set()
+        self.phenomenons: set[Hypersphere] = set()
+
         self.scenario = ACTIVE_SCENARIO(self)
         pygame.init()
 
@@ -42,7 +46,15 @@ class Simulation:
         if self.scenario:
             self.scenario.play(self.ct)
         self.space.step(dt)
-        self.space.tick()
+
+        for phenomenon in self.phenomenons:
+            phenomenon.tick()
+
+        for internal_ship in self.internal_ships:
+            internal_ship.tick()
+
+        # remove deleted phenomenons:
+        self.phenomenons = {item for item in self.phenomenons if item.state != PhenomenonState.DELETED}
 
     async def main_loop(self):
         while True:

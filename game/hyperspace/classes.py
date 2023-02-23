@@ -26,10 +26,6 @@ class Hyperspace(pymunk.Space):
         super().__init__(threaded=threaded)
         self.ships: List[HyperspaceShip] = []
 
-    def tick(self):
-        for ship in self.ships:
-            ship.tick()
-
 
 class HyperspaceShip:
     def __init__(self, internal_ship: InternalShip, position: Vec2d):
