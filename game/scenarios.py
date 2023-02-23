@@ -2,9 +2,6 @@ from __future__ import annotations
 
 import random
 
-from game.internal_ship.classes import InternalShip, Hypersphere, PhenomenonState
-from game.internal_ship.ship_panels import Cockpit
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -13,8 +10,13 @@ if TYPE_CHECKING:
 
 
 class BaseScenario:
+    from game.internal_ship.ship_panels import Cockpit, HypersphereGenerator
+
     PLAYER_SHIP_PANELS = [
         Cockpit(),
+    ]
+    PLAYER_SHIP_MODULES = [
+        HypersphereGenerator(power=5),
     ]
 
     def __init__(self, game: Simulation):
@@ -29,6 +31,7 @@ class BaseScenario:
         print(f"Setting up {self.__class__}.")
 
     def _setup_player_ship(self):
+        from game.internal_ship.classes import InternalShip
         print("adding player ship")
         print("setting up internal ship for player ship")
         player_ship = InternalShip(
@@ -36,14 +39,19 @@ class BaseScenario:
         )
         for panel in self.PLAYER_SHIP_PANELS:
             player_ship.add_panel(panel)
+
+        for module in self.PLAYER_SHIP_MODULES:
+            player_ship.add_module(module)
+
         player_ship.engine_percent = 0
         player_ship.rotation_engine_percent = 0
+        player_ship.modules.hypersphere_generator.enabled = False
 
         print("setting up hyperspace ship for player ship")
         starting_position = (500, 500)
         player_ship.create_hyperspace_ship(starting_position)
         # self.game.space.ships.append(hyperspace_ship)
-        # player_ship.hyperspace_ship = hyperspace_ship
+        # internal_ship.hyperspace_ship = hyperspace_ship
 
         self.game.player_ship = player_ship
 
@@ -98,10 +106,11 @@ class PlayerShipTestScenario(BaseScenario):
     def play(self, ct: int):
         super().play(ct)
         # if ct % 100 == 0:
-        #     self.game.player_ship.panels.cockpit.log("error", "Incomming transmission received!")
-        # print(self.game.player_ship.panels.cockpit.target_angle)
-        # self.game.player_ship.panels.cockpit.target_angle = 150
-        # print(self.game.player_ship.hyperspace_ship.target_angle)
+        #     self.game.internal_ship.panels.cockpit.log("error", "Incomming transmission received!")
+        # print(self.game.internal_ship.panels.cockpit.target_angle)
+        # self.game.internal_ship.panels.cockpit.target_angle = 150
+        # print(self.game.internal_ship.hyperspace_ship.target_angle)
+
 
 class HypersphereTestScenario(BaseScenario):
     def _setup(self):
@@ -112,10 +121,11 @@ class HypersphereTestScenario(BaseScenario):
     def play(self, ct: int):
         super().play(ct)
         if ct % 100 == 0:
-            Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
-        # print(self.game.player_ship.panels.cockpit.target_angle)
-        # self.game.player_ship.panels.cockpit.target_angle = 150
-        # print(self.game.player_ship.hyperspace_ship.target_angle)
+            self.game.player_ship.modules.hypersphere_generator.enabled = True
+        #     Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
+        # print(self.game.internal_ship.panels.cockpit.target_angle)
+        # self.game.internal_ship.panels.cockpit.target_angle = 150
+        # print(self.game.internal_ship.hyperspace_ship.target_angle)
 
 
 ACTIVE_SCENARIO = HypersphereTestScenario

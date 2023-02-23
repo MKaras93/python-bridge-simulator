@@ -15,6 +15,14 @@ class Cockpit(BasePanel):
     panel_type = "cockpit"
 
     @property
+    def hypersphere_generator_enabled(self) -> bool:
+        return self._client.get_attribute(self.panel_type, "hypersphere_generator_enabled")
+
+    @hypersphere_generator_enabled.setter
+    def hypersphere_generator_enabled(self, value: bool):
+        self._client.set_attribute(self.panel_type, "hypersphere_generator_enabled", value)
+
+    @property
     def target_angle(self) -> float:
         return self._client.get_attribute(self.panel_type, "target_angle")
 

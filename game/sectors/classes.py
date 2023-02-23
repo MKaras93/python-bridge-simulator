@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import typing
-from enum import Enum
 
 from pymunk import Vec2d
+
+from game.sectors.enums import SectorStateEnum
 
 if typing.TYPE_CHECKING:
     from game.hyperspace.classes import HyperspaceShip
@@ -34,11 +35,6 @@ class Sector:
 
     def remove_ship(self, ship: HyperspaceShip):
         self.ships.remove(ship)
-
-
-class SectorStateEnum(str, Enum):
-    #  Note: optimization potential here, switching to int enum might reduce the cost of storing a sector.
-    LOADED = "loaded"
 
 
 class SectorShip:
