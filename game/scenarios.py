@@ -4,6 +4,9 @@ import random
 
 from typing import TYPE_CHECKING
 
+from game.internal_ship.enums import PhenomenonState
+from game.internal_ship.phenomenons import Hypersphere
+
 if TYPE_CHECKING:
     from game.core import Simulation
     from game.hyperspace.classes import HyperspaceShip
@@ -117,11 +120,12 @@ class HypersphereTestScenario(BaseScenario):
         super()._setup()
         self._setup_player_ship()
         self.game.player_ship.target_angle = 50
+        self.game.player_ship.modules.hypersphere_generator.enabled = True
+        self.game.player_ship.hypersphere = Hypersphere(self.game.player_ship, 3, PhenomenonState.ACTIVE)
 
     def play(self, ct: int):
         super().play(ct)
-        if ct % 100 == 0:
-            self.game.player_ship.modules.hypersphere_generator.enabled = True
+        # if ct % 100 == 0:
         #     Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
         # print(self.game.internal_ship.panels.cockpit.target_angle)
         # self.game.internal_ship.panels.cockpit.target_angle = 150

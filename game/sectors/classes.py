@@ -42,6 +42,9 @@ class SectorShip:
         self.internal_ship: InternalShip = internal_ship
         self.sector: Sector = sector
 
+    def tick(self):
+        pass
+
     def destroy(self):
         self.internal_ship.sector_ship = None
         self.internal_ship = None

@@ -76,3 +76,8 @@ class InternalShip:
 
         for module in self.modules.attached:
             module.tick()
+
+        if self.hyperspace_ship:
+            self.hyperspace_ship.tick()
+        elif self.sector_ship:
+            self.sector_ship.tick()

@@ -164,7 +164,7 @@ class HypersphereGenerator:
                 self.internal_ship.panels.cockpit.log("info", f"Generating new hypersphere with power {self.power}.")
                 Hypersphere(self.internal_ship, power=self.power, state=PhenomenonState.PENDING)
             else:
-                hypersphere.power_up(self.power)
+                hypersphere.power_up(1)
 
 
 class ShipModules:
