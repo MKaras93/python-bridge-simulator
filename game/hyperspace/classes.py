@@ -46,6 +46,15 @@ class HyperspaceShip:
         self.sector: Optional[Sector] = None
 
     @property
+    def position(self):
+        return self.body.position
+
+    def destroy(self):
+        self.internal_ship.hyperspace_ship = None
+        self.internal_ship = None
+        print("{} destroyed.".format(self))
+
+    @property
     def angle(self) -> float:
         return anticlockwise_radian_to_clockwise_degrees(self.body.angle)
 

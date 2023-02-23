@@ -7,6 +7,7 @@ from pymunk import Vec2d
 
 if typing.TYPE_CHECKING:
     from game.hyperspace.classes import HyperspaceShip
+    from game.internal_ship.classes import InternalShip
 
 
 class Sector:
@@ -16,7 +17,7 @@ class Sector:
         self.ships = set()
         self.structures = set()
         self.allegiance = None
-        self._position = position
+        self.position = position
         self.name = "Sector {}".format(position)
         self.state = SectorStateEnum.LOADED
         self.sectors_map[position] = self
@@ -28,14 +29,6 @@ class Sector:
             sector = cls(position)
         return sector
 
-    @property
-    def x(self):
-        return self._position.x
-
-    @property
-    def y(self):
-        return self._position.y
-
     def add_ship(self, ship: HyperspaceShip):
         self.ships.add(ship)
 
@@ -46,3 +39,14 @@ class Sector:
 class SectorStateEnum(str, Enum):
     #  Note: optimization potential here, switching to int enum might reduce the cost of storing a sector.
     LOADED = "loaded"
+
+
+class SectorShip:
+    def __init__(self, internal_ship: InternalShip, sector: Sector):
+        self.internal_ship: InternalShip = internal_ship
+        self.sector: Sector = sector
+
+    def destroy(self):
+        self.internal_ship.sector_ship = None
+        self.internal_ship = None
+        print("{} destroyed".format(self))

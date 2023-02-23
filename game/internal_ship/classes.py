@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import typing
+from enum import Enum
 
 from pymunk import Vec2d
 
 from game.hyperspace.classes import HyperspaceShip
 from game.internal_ship.ship_panels import ShipPanels, ShipPanel
+from game.sectors.classes import SectorShip, Sector
 
 if typing.TYPE_CHECKING:
     from game.core import Simulation
@@ -22,6 +24,7 @@ class InternalShip:
         self.simulation: Simulation = simulation
         self.space: Hyperspace = simulation.space
         self.hyperspace_ship: typing.Optional[HyperspaceShip] = None
+        self.sector_ship: typing.Optional[SectorShip] = None
         self.panels: ShipPanels = ShipPanels()
         self.bridge_crew = [
             # TODO: placeholder for usernames of the bridge crew members
@@ -36,10 +39,58 @@ class InternalShip:
         self.rotation_engine_percent: int = 10
         self.target_angle = None
 
+        self.hypersphere = None
+
     def add_panel(self, panel: ShipPanel):
         setattr(self.panels, panel.panel_type, panel)
         panel.attach_to_ship(self)
 
     def create_hyperspace_ship(self, position: Vec2d) -> HyperspaceShip:
+        print("Entering hyperspace at ", position)
         self.hyperspace_ship = HyperspaceShip(self, position)
         return self.hyperspace_ship
+
+    def create_sector_ship(self, position: Vec2d) -> SectorShip:
+        print("Leaving hyperspace at ", position)
+        sector = Sector.get_sector(position)
+        self.sector_ship = SectorShip(self, sector)
+        return self.sector_ship
+
+    def tick(self):
+        in_hyperspace = True if self.hypersphere else False
+
+        if in_hyperspace:
+            if self.hyperspace_ship is None:
+                self.create_hyperspace_ship(self.sector_ship.sector.position)
+                self.sector_ship.destroy()
+        else:
+            if self.sector_ship is None:
+                self.create_sector_ship(self.hyperspace_ship.position)
+                self.hyperspace_ship.destroy()
+
+
+class PhenomenonState(str, Enum):
+    PENDING = "pending"
+    ACTIVE = "active"
+
+
+class Hypersphere:
+    def __init__(self, ship: InternalShip, power: int, state: PhenomenonState.PENDING):
+        self.ship: InternalShip = ship
+        self.power: int = power
+        self.state: PhenomenonState = state
+
+    def tick(self):
+        self.power -= 1
+        if self.power <= 0:
+            self.destroy()
+
+    def power_up(self, value: int):
+        self.power += value
+
+    def activate(self):
+        self.state = PhenomenonState.ACTIVE
+
+    def destroy(self):
+        self.ship.hypersphere = None
+        self.ship = None
