@@ -23,7 +23,6 @@ class InternalShip:
         self.space: Hyperspace = simulation.space
         self.hyperspace_ship: typing.Optional[HyperspaceShip] = None
         self.panels: ShipPanels = ShipPanels()
-        self.panel_names = set()
         self.bridge_crew = [
             # TODO: placeholder for usernames of the bridge crew members
             "test",
@@ -39,7 +38,6 @@ class InternalShip:
 
     def add_panel(self, panel: ShipPanel):
         setattr(self.panels, panel.panel_type, panel)
-        self.panel_names.add(panel.panel_type)
         panel.attach_to_ship(self)
 
     def create_hyperspace_ship(self, position: Vec2d) -> HyperspaceShip:
