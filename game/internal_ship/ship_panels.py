@@ -100,7 +100,7 @@ class Cockpit(ShipPanel):
 
     @hypersphere_generator_enabled.setter
     def hypersphere_generator_enabled(self, value: bool):
-        self.internal_ship.modules.hypersphere_generator.enabled = True
+        self.internal_ship.modules.hypersphere_generator.enabled = value
 
     def disengage_hyper_drive(self, timer: int = 0):
         # mocked method to test method calls
@@ -147,8 +147,8 @@ class HypersphereGenerator:
 
     @enabled.setter
     def enabled(self, value):
-        self._enabled = value
         if self._enabled != value:
+            self._enabled = value
             state = "ENABLED" if value else "DISABLED"
             self.internal_ship.panels.cockpit.log("info", f"Hypersphere Generator is now {state}.")
 

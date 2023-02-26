@@ -48,6 +48,8 @@ class HyperspaceShip:
     def destroy(self):
         self.internal_ship.hyperspace_ship = None
         self.internal_ship = None
+        self.space.ships.remove(self)
+        self.space.remove(self.body, self._circle)
         print("{} destroyed.".format(self))
 
     @property
