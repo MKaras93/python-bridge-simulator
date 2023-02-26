@@ -4,6 +4,8 @@ import random
 
 from typing import TYPE_CHECKING
 
+from pymunk import Vec2d
+
 from game.internal_ship.enums import PhenomenonState
 from game.internal_ship.phenomenons import Hypersphere
 
@@ -33,8 +35,9 @@ class BaseScenario:
     def _setup(self):
         print(f"Setting up {self.__class__}.")
 
-    def _setup_player_ship(self):
+    def _setup_player_ship(self, coords=(500, 500), in_hyperspace=True):
         from game.internal_ship.classes import InternalShip
+
         print("adding player ship")
         print("setting up internal ship for player ship")
         player_ship = InternalShip(
@@ -50,9 +53,16 @@ class BaseScenario:
         player_ship.rotation_engine_percent = 0
         player_ship.modules.hypersphere_generator.enabled = False
 
-        print("setting up hyperspace ship for player ship")
-        starting_position = (500, 500)
-        player_ship.create_hyperspace_ship(starting_position)
+        if in_hyperspace:
+            print("setting up hyperspace ship for player ship")
+            player_ship.create_hyperspace_ship(coords)
+            player_ship.modules.hypersphere_generator.enabled = True
+            player_ship.hypersphere = Hypersphere(
+                player_ship, 2, PhenomenonState.ACTIVE
+            )
+        else:
+            print("setting up sector ship for player ship")
+            player_ship.create_sector_ship(coords)
         # self.game.space.ships.append(hyperspace_ship)
         # internal_ship.hyperspace_ship = hyperspace_ship
 
@@ -121,7 +131,9 @@ class HypersphereTestScenario(BaseScenario):
         self._setup_player_ship()
         self.game.player_ship.target_angle = 50
         self.game.player_ship.modules.hypersphere_generator.enabled = True
-        self.game.player_ship.hypersphere = Hypersphere(self.game.player_ship, 3, PhenomenonState.ACTIVE)
+        self.game.player_ship.hypersphere = Hypersphere(
+            self.game.player_ship, 3, PhenomenonState.ACTIVE
+        )
 
     def play(self, ct: int):
         super().play(ct)
@@ -132,4 +144,28 @@ class HypersphereTestScenario(BaseScenario):
         # print(self.game.internal_ship.hyperspace_ship.target_angle)
 
 
-ACTIVE_SCENARIO = HypersphereTestScenario
+class SectorToSectorTestScenario(BaseScenario):
+    def _setup(self):
+        super()._setup()
+        starting_coords = Vec2d(random.randint(0, 1000), random.randint(0, 1000))
+        self.target_coords = Vec2d(random.randint(0, 1000), random.randint(0, 1000))
+        self._setup_player_ship(starting_coords, in_hyperspace=False)
+        self.game.player_ship.panels.cockpit.log("INFO", f"starting_coords: {starting_coords}")
+        self.game.player_ship.panels.cockpit.log("INFO", f"target_coords: {self.target_coords}")
+
+    def play(self, ct: int):
+        super().play(ct)
+        sector_ship = self.game.player_ship.sector_ship
+        if sector_ship and sector_ship.sector.position == self.target_coords:
+            print("YOU HAVE WON")
+            self.game.player_ship.panels.cockpit.log("IMPORTANT",  "YOU HAVE WON!")
+
+
+        # if ct % 100 == 0:
+        #     Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
+        # print(self.game.internal_ship.panels.cockpit.target_angle)
+        # self.game.internal_ship.panels.cockpit.target_angle = 150
+        # print(self.game.internal_ship.hyperspace_ship.target_angle)
+
+
+ACTIVE_SCENARIO = SectorToSectorTestScenario

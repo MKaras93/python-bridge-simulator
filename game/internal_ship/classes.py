@@ -67,6 +67,7 @@ class InternalShip:
 
         if in_hyperspace:
             if self.hyperspace_ship is None:
+                self.panels.cockpit.log("INFO", f"Leaving {self.sector_ship.sector} and entering hyperspace!")
                 self.create_hyperspace_ship(self.sector_ship.sector.position)
                 self.sector_ship.destroy()
         else:

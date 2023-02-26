@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pymunk import Vec2d
+
 from client.http_client.api_client import APIClient, BaseClient
 
 CLIENT_CLASS = APIClient
@@ -13,6 +15,10 @@ class BasePanel:
 
 class Cockpit(BasePanel):
     panel_type = "cockpit"
+
+    @property
+    def position(self) -> Vec2d:
+        return self._client.get_attribute(self.panel_type, "position")
 
     @property
     def hypersphere_generator_enabled(self) -> bool:
@@ -56,6 +62,15 @@ class Cockpit(BasePanel):
 
     def disengage_hyper_drive(self, timer: int = 0):
         return self._client.call_method(self.panel_type, "disengage_hyper_drive", timer=timer)
+
+    def p(self) -> None:
+        try:
+            while True:
+                print("...", end="\r", flush=True)
+                self._client.get_attribute(self.panel_type, "status")
+                print("...", end="\r", flush=True)
+        except KeyboardInterrupt:
+            print("OK", end="\r", flush=True)
 
 
 class MotherShip:

@@ -4,6 +4,8 @@ import abc
 from typing import Optional, Any
 from typing import TYPE_CHECKING
 
+from pymunk import Vec2d
+
 from game.errors import (
     NoSuchPanelAttributeException,
     NoSuchPanelException,
@@ -61,6 +63,13 @@ class Cockpit(ShipPanel):
     panel_type = "cockpit"
 
     @property
+    def position(self) -> Vec2d:
+        if self.internal_ship.sector_ship:
+            return self.internal_ship.sector_ship.sector.position
+        else:
+            return self.internal_ship.hyperspace_ship.position
+
+    @property
     def target_angle(self) -> float:
         return self.internal_ship.target_angle
 
@@ -107,6 +116,10 @@ class Cockpit(ShipPanel):
         print(f"Disengaging hyper drive in {timer}")
         print(f"Hyper drive disengaged!")
         return True
+
+    @property
+    def status(self) -> None:
+        return None
 
 
 class Configuration(ShipPanel):
