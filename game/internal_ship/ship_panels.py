@@ -152,22 +152,29 @@ class ShipPanels:
 
 
 class ShipModule(abc.ABC):
-    module_type = None
+    module_type: str = None
+    logging_panel_type: str = None
 
     def __init__(self):
         self.internal_ship: Optional[InternalShip] = None
+        self._logging_panel: Optional[ShipPanel] = None
 
     def attach_to_ship(self, internal_ship: InternalShip):
         self.internal_ship = internal_ship
         self.internal_ship.modules.attached.add(self)
+        self._logging_panel = getattr(self.internal_ship.panels, self.logging_panel_type)
         print("Attached module:", self)
 
     def tick(self):
         pass
 
+    def log(self, level: str, message: str) -> None:
+        self._logging_panel.log(level, message)
+
 
 class HypersphereGenerator(ShipModule):
     module_type = "hypersphere_generator"
+    logging_panel_type = "cockpit"
 
     def __init__(self, power: int):
         super().__init__()
@@ -183,7 +190,7 @@ class HypersphereGenerator(ShipModule):
         if self._enabled != value:
             self._enabled = value
             state = "ENABLED" if value else "DISABLED"
-            self.internal_ship.panels.cockpit.log(
+            self.log(
                 "info", f"Hypersphere Generator is now {state}."
             )
 
@@ -192,7 +199,7 @@ class HypersphereGenerator(ShipModule):
         if self.enabled:
             hypersphere = self.internal_ship.hypersphere
             if not hypersphere:
-                self.internal_ship.panels.cockpit.log(
+                self..log(
                     "info", f"Generating new hypersphere with power {self.power}."
                 )
                 Hypersphere(
@@ -204,6 +211,7 @@ class HypersphereGenerator(ShipModule):
 
 class RotationDrive(ShipModule):
     module_type = "rotation_drive"
+    logging_panel_type = "cockpit"
 
     def __init__(self, tick_rotation: float):
         super().__init__()
@@ -240,6 +248,54 @@ class RotationDrive(ShipModule):
             angle_diff = angle_diff + sign * 360
 
         return angle_diff
+
+
+class Autopilot(ShipModule):
+    module_type = "autopilot"
+    logging_panel_type = "cockpit"
+
+    def __init__(self):
+        super().__init__()
+        self.target_position: Optional[Vec2d] = None
+        self.enabled = False
+        self._previous_distance = None
+
+    def tick(self):
+        super().tick()
+        if (
+            not self.internal_ship.hyperspace_ship
+            or not self.enabled
+            or self.target_position is None
+        ):
+            return
+
+        distance_to_target = self._get_distance_to_target()
+        if distance_to_target <= 0.5:
+            # log message
+            self._stop_ship()
+            self.target_position = None
+            return
+
+        if (
+            self._previous_distance is not None
+            and distance_to_target > self._previous_distance
+        ):
+            # log message
+            self._stop_ship()
+            return
+
+        self._previous_distance = distance_to_target
+
+    def _get_distance_to_target(self) -> float:
+        return self.internal_ship.hyperspace_ship.position.get_distance(
+            self.target_position
+        )
+
+    def _stop_ship(self):
+        # log message stopping ship
+        self.internal_ship.panels.cockpit.hyper_drive_percent = 0
+        self.enabled = False
+        self._previous_distance = None
 
 
 class ShipModules:
