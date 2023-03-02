@@ -8,6 +8,7 @@ from pymunk import Vec2d
 
 from game.internal_ship.enums import PhenomenonState
 from game.internal_ship.phenomenons import Hypersphere
+from game.internal_ship.ship_panels import Autopilot
 
 if TYPE_CHECKING:
     from game.core import Simulation
@@ -27,6 +28,7 @@ class BaseScenario:
     PLAYER_SHIP_MODULES = [
         HypersphereGenerator(power=5),
         RotationDrive(5),
+        Autopilot(),
     ]
 
     def __init__(self, game: Simulation):
@@ -154,8 +156,8 @@ class SectorToSectorTestScenario(BaseScenario):
         super()._setup()
         starting_coords = Vec2d(random.randint(300, 500), random.randint(300, 500))
         starting_coords = Vec2d(300, -300)
-        self.target_coords = Vec2d(random.randint(300, 500), random.randint(300, 500))
-        self.target_coords = Vec2d(400, -400)
+        self.target_coords = Vec2d(random.randint(300, 500), -500)
+        # self.target_coords = Vec2d(400, -400)
         self._setup_player_ship(starting_coords, in_hyperspace=False)
         self.game.player_ship.panels.cockpit.log(
             "INFO", f"starting_coords: {starting_coords}"
@@ -171,13 +173,13 @@ class SectorToSectorTestScenario(BaseScenario):
             print("YOU HAVE WON")
             self.game.player_ship.panels.cockpit.log("IMPORTANT", "YOU HAVE WON!")
 
-        if ct == 5:
-            self.game.player_ship.panels.cockpit.hypersphere_generator_enabled = True
-
-        if ct % 100 == 0:
-            self.game.player_ship.panels.cockpit.target_angle = (
-                self.game.player_ship.hyperspace_ship.angle + 15
-            )
+        # if ct == 5:
+        #     self.game.player_ship.panels.cockpit.hypersphere_generator_enabled = True
+        #
+        # if ct % 100 == 0:
+        #     self.game.player_ship.panels.cockpit.target_angle = (
+        #         self.game.player_ship.hyperspace_ship.angle + 15
+        #     )
 
             # Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
         # print(self.game.internal_ship.panels.cockpit.target_angle)

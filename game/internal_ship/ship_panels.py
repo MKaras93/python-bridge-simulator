@@ -79,8 +79,7 @@ class Cockpit(ShipPanel):
 
     @target_angle.setter
     def target_angle(self, value: float):
-        if value is not None and not self.rotation_drive_percent:
-            self.log("warning", "Target angle set but rotation drive is off.")
+        self.log("INFO", f"Target angle set to {value} degrees.")
         self.internal_ship.target_angle = value
 
     @property
@@ -114,12 +113,6 @@ class Cockpit(ShipPanel):
     @hypersphere_generator_enabled.setter
     def hypersphere_generator_enabled(self, value: bool):
         self.internal_ship.modules.hypersphere_generator.enabled = value
-
-    def disengage_hyper_drive(self, timer: int = 0):
-        # mocked method to test method calls
-        print(f"Disengaging hyper drive in {timer}")
-        print(f"Hyper drive disengaged!")
-        return True
 
     @property
     def status(self) -> None:
@@ -199,7 +192,7 @@ class HypersphereGenerator(ShipModule):
         if self.enabled:
             hypersphere = self.internal_ship.hypersphere
             if not hypersphere:
-                self..log(
+                self.log(
                     "info", f"Generating new hypersphere with power {self.power}."
                 )
                 Hypersphere(
@@ -236,8 +229,6 @@ class RotationDrive(ShipModule):
         if abs(rotation_value) > self.tick_rotation:
             rotation_value = self.tick_rotation * rotation_sign
 
-        angle = self.internal_ship.hyperspace_ship.angle
-        new_angle = angle + rotation_value
         self.internal_ship.hyperspace_ship.angle += rotation_value
 
     @staticmethod
@@ -271,7 +262,7 @@ class Autopilot(ShipModule):
 
         distance_to_target = self._get_distance_to_target()
         if distance_to_target <= 0.5:
-            # log message
+            self.log("INFO", "Destination in range.")
             self._stop_ship()
             self.target_position = None
             return
@@ -280,7 +271,7 @@ class Autopilot(ShipModule):
             self._previous_distance is not None
             and distance_to_target > self._previous_distance
         ):
-            # log message
+            self.log("WARNING", "Wrong direction! Moving away from the destination!")
             self._stop_ship()
             return
 
@@ -292,7 +283,7 @@ class Autopilot(ShipModule):
         )
 
     def _stop_ship(self):
-        # log message stopping ship
+        self.log("INFO", "Stopping hyper drive. Disengaging Autopilot.")
         self.internal_ship.panels.cockpit.hyper_drive_percent = 0
         self.enabled = False
         self._previous_distance = None

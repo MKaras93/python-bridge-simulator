@@ -44,13 +44,13 @@ class Cockpit(BasePanel):
     def hyper_drive_percent(self, value: float):
         self._client.set_attribute(self.panel_type, "hyper_drive_percent", value)
 
-    @property
-    def rotation_drive_percent(self) -> float:
-        return self._client.get_attribute(self.panel_type, "rotation_drive_percent")
-
-    @rotation_drive_percent.setter
-    def rotation_drive_percent(self, value: float):
-        self._client.set_attribute(self.panel_type, "rotation_drive_percent", value)
+    # @property
+    # def rotation_drive_percent(self) -> float:
+    #     return self._client.get_attribute(self.panel_type, "rotation_drive_percent")
+    #
+    # @rotation_drive_percent.setter
+    # def rotation_drive_percent(self, value: float):
+    #     self._client.set_attribute(self.panel_type, "rotation_drive_percent", value)
 
     @property
     def hyper_drive_timer(self) -> float:
