@@ -118,6 +118,23 @@ class Cockpit(ShipPanel):
     def status(self) -> None:
         return None
 
+    @property
+    def autopilot_enabled(self) -> bool:
+        return self.internal_ship.modules.autopilot.enabled
+
+    @autopilot_enabled.setter
+    def autopilot_enabled(self, value: bool):
+        self.internal_ship.modules.autopilot.enabled = value
+
+    @property
+    def autopilot_target_destination(self) -> Optional[Vec2d]:
+        return self.internal_ship.modules.autopilot.target_position
+
+    @autopilot_target_destination.setter
+    def autopilot_target_destination(self, value: Vec2d):
+        self.log("INFO", f"Autopilot set to {value}")
+        self.internal_ship.modules.autopilot.target_position = value
+
 
 class Configuration(ShipPanel):
     """
@@ -217,7 +234,7 @@ class RotationDrive(ShipModule):
 
     def _rotate_ship(self):
         target_angle = self.internal_ship.panels.cockpit.target_angle
-        if target_angle is None:
+        if target_angle is None or target_angle == self.internal_ship.hyperspace_ship.angle:
             return
 
         rotation_value = self._get_rotation_value(
@@ -230,6 +247,8 @@ class RotationDrive(ShipModule):
             rotation_value = self.tick_rotation * rotation_sign
 
         self.internal_ship.hyperspace_ship.angle += rotation_value
+        if self.internal_ship.hyperspace_ship.angle == target_angle:
+            self.log("INFO", "Target angle locked.")
 
     @staticmethod
     def _get_rotation_value(current_angle: float, target_angle: float):
@@ -295,3 +314,4 @@ class ShipModules:
     def __init__(self):
         self.hypersphere_generator: Optional[HypersphereGenerator] = None
         self.rotation_drive: Optional[RotationDrive] = None
+        self.autopilot: Optional[Autopilot] = None

@@ -85,7 +85,6 @@ class HyperspaceShip:
             if now >= self.internal_ship.engine_cut_off_time:
                 self._cut_off_engine()
 
-
     @property
     def sector_coords(self):
         return get_sector_coords(self.position)

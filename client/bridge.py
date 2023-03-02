@@ -63,6 +63,22 @@ class Cockpit(BasePanel):
     def disengage_hyper_drive(self, timer: int = 0):
         return self._client.call_method(self.panel_type, "disengage_hyper_drive", timer=timer)
 
+    @property
+    def autopilot_enabled(self) -> bool:
+        return self._client.get_attribute(self.panel_type, "autopilot_enabled")
+
+    @autopilot_enabled.setter
+    def autopilot_enabled(self, value: bool):
+        self._client.set_attribute(self.panel_type, "autopilot_enabled", value)
+
+    @property
+    def autopilot_target_destination(self) -> Vec2d:
+        return self._client.get_attribute(self.panel_type, "autopilot_target_destination")
+
+    @autopilot_target_destination.setter
+    def autopilot_target_destination(self, value: Vec2d):
+        self._client.set_attribute(self.panel_type, "autopilot_target_destination", value)
+
     def p(self) -> None:
         try:
             while True:

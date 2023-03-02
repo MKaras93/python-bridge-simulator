@@ -10,7 +10,7 @@ def create_circle_for_body(space: "Hyperspace", body: pymunk.Body, radius=10):
 
 
 def get_sector_coords(position):
-    SECTOR_SIZE = 10
+    SECTOR_SIZE = 1
 
     def _get_sector_coord(coord: float) -> int:
         return math.ceil(coord / SECTOR_SIZE)

@@ -52,12 +52,12 @@ class InternalShip:
         module.attach_to_ship(self)
 
     def create_hyperspace_ship(self, position: Vec2d) -> HyperspaceShip:
-        print("Entering hyperspace at ", position)
+        self.panels.cockpit.log("INFO", f"Entering hyperspace at {position}")
         self.hyperspace_ship = HyperspaceShip(self, position)
         return self.hyperspace_ship
 
     def create_sector_ship(self, position: Vec2d) -> SectorShip:
-        print("Leaving hyperspace at ", position)
+        self.panels.cockpit.log("INFO",f"Leaving hyperspace at {position}")
         sector = Sector.get_sector(position)
         self.sector_ship = SectorShip(self, sector)
         return self.sector_ship
@@ -72,7 +72,7 @@ class InternalShip:
                 self.sector_ship.destroy()
         else:
             if self.sector_ship is None:
-                self.create_sector_ship(self.hyperspace_ship.position)
+                self.create_sector_ship(self.hyperspace_ship.sector_coords)
                 self.hyperspace_ship.destroy()
 
         for module in self.modules.attached:
