@@ -10,6 +10,7 @@ import pymunk.pygame_util
 
 from .hyperspace.classes import Hyperspace
 from .internal_ship.enums import PhenomenonState
+from .unit_transformation import PygamePymunkImplementationUnitsTransformer
 
 if TYPE_CHECKING:
     from typing import Optional, Any
@@ -20,9 +21,8 @@ if TYPE_CHECKING:
 
 
 class Simulation:
-    @staticmethod
-    def _get_space() -> Hyperspace:
-        space = Hyperspace()
+    def _get_space(self) -> Hyperspace:
+        space = Hyperspace(self)
         space.gravity = 0, 0
         space.damping = 0.2
         return space
@@ -37,6 +37,7 @@ class Simulation:
         self.player_ship: Optional[InternalShip] = None
         self.internal_ships: set[InternalShip] = set()
         self.phenomenons: set[Hypersphere] = set()
+        self.transformer = PygamePymunkImplementationUnitsTransformer
 
         from .scenarios import ACTIVE_SCENARIO
 

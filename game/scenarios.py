@@ -15,13 +15,18 @@ if TYPE_CHECKING:
 
 
 class BaseScenario:
-    from game.internal_ship.ship_panels import Cockpit, HypersphereGenerator
+    from game.internal_ship.ship_panels import (
+        Cockpit,
+        HypersphereGenerator,
+        RotationDrive,
+    )
 
     PLAYER_SHIP_PANELS = [
         Cockpit(),
     ]
     PLAYER_SHIP_MODULES = [
         HypersphereGenerator(power=5),
+        RotationDrive(5),
     ]
 
     def __init__(self, game: Simulation):
@@ -147,22 +152,34 @@ class HypersphereTestScenario(BaseScenario):
 class SectorToSectorTestScenario(BaseScenario):
     def _setup(self):
         super()._setup()
-        starting_coords = Vec2d(random.randint(0, 1000), random.randint(0, 1000))
-        self.target_coords = Vec2d(random.randint(0, 1000), random.randint(0, 1000))
+        starting_coords = Vec2d(random.randint(300, 500), random.randint(300, 500))
+        starting_coords = Vec2d(300, -300)
+        self.target_coords = Vec2d(random.randint(300, 500), random.randint(300, 500))
+        self.target_coords = Vec2d(400, -400)
         self._setup_player_ship(starting_coords, in_hyperspace=False)
-        self.game.player_ship.panels.cockpit.log("INFO", f"starting_coords: {starting_coords}")
-        self.game.player_ship.panels.cockpit.log("INFO", f"target_coords: {self.target_coords}")
+        self.game.player_ship.panels.cockpit.log(
+            "INFO", f"starting_coords: {starting_coords}"
+        )
+        self.game.player_ship.panels.cockpit.log(
+            "INFO", f"target_coords: {self.target_coords}"
+        )
 
     def play(self, ct: int):
         super().play(ct)
         sector_ship = self.game.player_ship.sector_ship
         if sector_ship and sector_ship.sector.position == self.target_coords:
             print("YOU HAVE WON")
-            self.game.player_ship.panels.cockpit.log("IMPORTANT",  "YOU HAVE WON!")
+            self.game.player_ship.panels.cockpit.log("IMPORTANT", "YOU HAVE WON!")
 
+        if ct == 5:
+            self.game.player_ship.panels.cockpit.hypersphere_generator_enabled = True
 
-        # if ct % 100 == 0:
-        #     Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
+        if ct % 100 == 0:
+            self.game.player_ship.panels.cockpit.target_angle = (
+                self.game.player_ship.hyperspace_ship.angle + 15
+            )
+
+            # Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
         # print(self.game.internal_ship.panels.cockpit.target_angle)
         # self.game.internal_ship.panels.cockpit.target_angle = 150
         # print(self.game.internal_ship.hyperspace_ship.target_angle)

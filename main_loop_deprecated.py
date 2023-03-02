@@ -29,7 +29,7 @@ def get_ship():
     ship = space.create_ship((random.randint(0, 500), random.randint(0, 500)), 0)
     ship.engine_power = 500
     ship.engine_percent = 10
-    create_circle_for_body(ship.body)
+    create_circle_for_body(ship._body)
     ship.rotation_engine_power = 90
     ship.rotation_engine_percent = 50
     ship.angle = 0
@@ -39,17 +39,17 @@ def get_ship():
 
 ships = [get_ship() for i in range (0, 4)]
 
-# ship.body.apply_force_at_local_point((-900, 0))
-# ship.body.apply_force_at_local_point((-1000, 0))
+# ship._body.apply_force_at_local_point((-900, 0))
+# ship._body.apply_force_at_local_point((-1000, 0))
 
-# body = pymunk.Body(body_type=pymunk.Body.KINEMATIC, mass=0)
-# body.position = 500, 500
-# body.angle = math.radians(45)
+# _body = pymunk.Body(body_type=pymunk.Body.KINEMATIC, mass=0)
+# _body.position = 500, 500
+# _body.angle = math.radians(45)
 # force = (10000, 10000)
-# body.apply_impulse_at_local_point(force)
-# body.velocity = -10, 0
-# circle = pymunk.circle.create_box(body, size=(100, 10))
-# space.add(body, circle)
+# _body.apply_impulse_at_local_point(force)
+# _body.velocity = -10, 0
+# circle = pymunk.circle.create_box(_body, size=(100, 10))
+# space.add(_body, circle)
 # loop
 
 
@@ -88,10 +88,10 @@ def update(dt):
         # pass
 
     # if update.engines_on:
-    #     ship.body.apply_force_at_local_point((500, 0))
-    # ship.body.apply_force_at_local_point((1000, 0))
-    # print(ship.body.force)
-    # print(ship.body.velocity)
+    #     ship._body.apply_force_at_local_point((500, 0))
+    # ship._body.apply_force_at_local_point((1000, 0))
+    # print(ship._body.force)
+    # print(ship._body.velocity)
 
 
 pyglet.clock.schedule_interval(update, 1/60)
@@ -101,7 +101,7 @@ pyglet.app.run()
 # def _fly_to_point(ship: HyperspaceShip, target_x, target_y):
 #     ship.rotation_engine_percent = 0
 #     ship.engine_percent = 0
-#     angle = ship.body.position.get_angle_degrees_between(Vec2d(target_x, target_y))
+#     angle = ship._body.position.get_angle_degrees_between(Vec2d(target_x, target_y))
 #     print("angle:", angle)
 #     ship.target_angle = ship.angle - angle
 #     if ship.target_angle:
@@ -109,7 +109,7 @@ pyglet.app.run()
 #
 #     if ship.angle - ship.target_angle < 5:
 #         ship.rotation_engine_percent = 0
-#         distance = ship.body.position.get_distance((target_x, target_y))
+#         distance = ship._body.position.get_distance((target_x, target_y))
 #         print("distance to target:", distance)
 #         ship.engine_percent = distance
 #         if distance <= 10:

@@ -45,7 +45,9 @@ class ShipPanel(abc.ABC):
         return value
 
     def call_method(self, method_name, **kwargs):
-        self._validate_attribute_name(method_name)  # method is just an attribute - same logic
+        self._validate_attribute_name(
+            method_name
+        )  # method is just an attribute - same logic
         # TODO: think of some argument validation - there would be different validation for each method. Pydantic?
         method = getattr(self, method_name)
         return method(**kwargs)
@@ -53,7 +55,9 @@ class ShipPanel(abc.ABC):
     @property
     def operators(self):
         # if no one has permission, every one has permission.
-        return self.internal_ship.panel_permissions.get(self.panel_type, self.internal_ship.bridge_crew)
+        return self.internal_ship.panel_permissions.get(
+            self.panel_type, self.internal_ship.bridge_crew
+        )
 
     def log(self, level: str, message: str):
         self.internal_ship.simulation.game.log(level=level, message=message, panel=self)
@@ -126,6 +130,7 @@ class Configuration(ShipPanel):
     """
     Panel responsible for different settings, such as permissions to different panels.
     """
+
     panel_type = "configuration"
 
     @property
@@ -146,11 +151,26 @@ class ShipPanels:
             raise NoSuchPanelException(f"Panel '{panel_name}' does not exist.")
 
 
-class HypersphereGenerator:
+class ShipModule(abc.ABC):
+    module_type = None
+
+    def __init__(self):
+        self.internal_ship: Optional[InternalShip] = None
+
+    def attach_to_ship(self, internal_ship: InternalShip):
+        self.internal_ship = internal_ship
+        self.internal_ship.modules.attached.add(self)
+        print("Attached module:", self)
+
+    def tick(self):
+        pass
+
+
+class HypersphereGenerator(ShipModule):
     module_type = "hypersphere_generator"
 
     def __init__(self, power: int):
-        self.internal_ship: Optional[InternalShip] = None
+        super().__init__()
         self.power = power
         self._enabled = False
 
@@ -163,21 +183,63 @@ class HypersphereGenerator:
         if self._enabled != value:
             self._enabled = value
             state = "ENABLED" if value else "DISABLED"
-            self.internal_ship.panels.cockpit.log("info", f"Hypersphere Generator is now {state}.")
-
-    def attach_to_ship(self, internal_ship: InternalShip):
-        self.internal_ship = internal_ship
-        self.internal_ship.modules.attached.add(self)
-        print("Attached module:", self)
+            self.internal_ship.panels.cockpit.log(
+                "info", f"Hypersphere Generator is now {state}."
+            )
 
     def tick(self):
+        super().tick()
         if self.enabled:
             hypersphere = self.internal_ship.hypersphere
             if not hypersphere:
-                self.internal_ship.panels.cockpit.log("info", f"Generating new hypersphere with power {self.power}.")
-                Hypersphere(self.internal_ship, power=self.power, state=PhenomenonState.PENDING)
+                self.internal_ship.panels.cockpit.log(
+                    "info", f"Generating new hypersphere with power {self.power}."
+                )
+                Hypersphere(
+                    self.internal_ship, power=self.power, state=PhenomenonState.PENDING
+                )
             else:
                 hypersphere.power_up(1)
+
+
+class RotationDrive(ShipModule):
+    module_type = "rotation_drive"
+
+    def __init__(self, tick_rotation: float):
+        super().__init__()
+        self.tick_rotation = tick_rotation
+
+    def tick(self):
+        super().tick()
+        if self.internal_ship.hyperspace_ship:
+            self._rotate_ship()
+
+    def _rotate_ship(self):
+        target_angle = self.internal_ship.panels.cockpit.target_angle
+        if target_angle is None:
+            return
+
+        rotation_value = self._get_rotation_value(
+            current_angle=self.internal_ship.hyperspace_ship.angle,
+            target_angle=target_angle,
+        )
+        rotation_sign = -1 if rotation_value < 0 else 1
+
+        if abs(rotation_value) > self.tick_rotation:
+            rotation_value = self.tick_rotation * rotation_sign
+
+        angle = self.internal_ship.hyperspace_ship.angle
+        new_angle = angle + rotation_value
+        self.internal_ship.hyperspace_ship.angle += rotation_value
+
+    @staticmethod
+    def _get_rotation_value(current_angle: float, target_angle: float):
+        angle_diff = target_angle - current_angle
+        if abs(angle_diff) > 180:
+            sign = -1 if angle_diff > 0 else 1
+            angle_diff = angle_diff + sign * 360
+
+        return angle_diff
 
 
 class ShipModules:
@@ -185,3 +247,4 @@ class ShipModules:
 
     def __init__(self):
         self.hypersphere_generator: Optional[HypersphereGenerator] = None
+        self.rotation_drive: Optional[RotationDrive] = None

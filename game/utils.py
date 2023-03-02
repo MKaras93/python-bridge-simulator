@@ -4,16 +4,6 @@ import pymunk
 from pymunk import Vec2d
 
 
-def clockwise_degrees_to_anti_clockwise_radian(degrees: float) -> float:
-    inverted_degrees = 450 - (degrees % 360)
-    return math.radians(inverted_degrees)
-
-
-def anticlockwise_radian_to_clockwise_degrees(radians: float) -> float:
-    inverted_degrees = math.degrees(radians)
-    return (450 - inverted_degrees) % 360
-
-
 def create_circle_for_body(space: "Hyperspace", body: pymunk.Body, radius=10):
     circle = pymunk.Circle(body, radius=radius)
     space.add(circle)

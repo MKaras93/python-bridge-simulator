@@ -25,7 +25,6 @@ class Hypersphere:
         self._add_pending_attributes()
 
         self.power -= 1
-        print(f"Hypersphere has {self.power} power left")
         if self.power <= 0:
             self.destroy()
 
