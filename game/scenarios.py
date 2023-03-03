@@ -9,6 +9,7 @@ from pymunk import Vec2d
 from game.internal_ship.enums import PhenomenonState
 from game.internal_ship.phenomenons import Hypersphere
 from game.internal_ship.ship_panels import Autopilot
+from game.utils import get_course, get_sector_coords
 
 if TYPE_CHECKING:
     from game.core import Simulation
@@ -156,7 +157,7 @@ class SectorToSectorTestScenario(BaseScenario):
         super()._setup()
         starting_coords = Vec2d(random.randint(300, 500), random.randint(300, 500))
         starting_coords = Vec2d(300, -300)
-        self.target_coords = Vec2d(random.randint(300, 500), -500)
+        self.target_coords = Vec2d(305, -305)
         # self.target_coords = Vec2d(400, -400)
         self._setup_player_ship(starting_coords, in_hyperspace=False)
         self.simulation.player_ship.panels.cockpit.log(
@@ -173,6 +174,19 @@ class SectorToSectorTestScenario(BaseScenario):
             print("YOU HAVE WON")
             self.simulation.player_ship.panels.cockpit.log("IMPORTANT", "YOU HAVE WON!")
 
+        # complete scenario:
+        cockpit = self.simulation.player_ship.panels.cockpit
+        if ct == 5:
+            cockpit.hypersphere_generator_enabled = True
+        if ct == 15:
+            cockpit.target_angle = get_course(cockpit.position, self.target_coords)
+            cockpit.autopilot_target_destination = self.target_coords
+            cockpit.autopilot_enabled = True
+        if ct == 25:
+            cockpit.hyper_drive_percent = 1
+        if get_sector_coords(cockpit.position) == self.target_coords:
+            cockpit.hypersphere_generator_enabled = False
+
         # if ct == 5:
         #     self.game.player_ship.panels.cockpit.hypersphere_generator_enabled = True
         #
@@ -181,7 +195,7 @@ class SectorToSectorTestScenario(BaseScenario):
         #         self.game.player_ship.hyperspace_ship.angle + 15
         #     )
 
-            # Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
+        # Hypersphere(self.game.player_ship, 10, PhenomenonState.ACTIVE)
         # print(self.game.internal_ship.panels.cockpit.target_angle)
         # self.game.internal_ship.panels.cockpit.target_angle = 150
         # print(self.game.internal_ship.hyperspace_ship.target_angle)

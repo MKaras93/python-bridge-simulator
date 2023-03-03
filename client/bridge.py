@@ -3,6 +3,7 @@ from __future__ import annotations
 from pymunk import Vec2d
 
 from client.http_client.api_client import APIClient, BaseClient
+from game.utils import get_course, get_sector_coords # noqa
 
 CLIENT_CLASS = APIClient
 

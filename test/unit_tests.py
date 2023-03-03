@@ -8,6 +8,8 @@ from game.unit_transformation import (
 )
 import math
 
+from game.utils import get_sector_coords
+
 
 @pytest.mark.parametrize(
     ["current_angle", "target_angle", "expected_result"],
@@ -91,3 +93,20 @@ class TestPygamePymunkImplementationUnitsTransformer:
     def test_from_impl_angle(self, expected_result, input_value):
         result = Transformer.from_impl_angle(input_value)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    ("coords", "expected_result"),
+    (
+        ((0, 0), (0, 0)),
+        ((-1, 1), (-1, 1)),
+        ((2, 3), (2, 3)),
+        ((0.1, 0.1), (0, 0)),
+        ((1.7, -12.523), (2, -13)),
+        ((0.5, 1.5), (1, 2)),
+        ((-5.5, 23.5), (-6, 24)),  # first I thought about -5, but it seems rounding to absolute down/up is the standard
+    ),
+)
+def test_get_sector_coords(coords, expected_result):
+    result = get_sector_coords(coords)
+    assert result == expected_result
